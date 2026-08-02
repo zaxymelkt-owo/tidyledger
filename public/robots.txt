@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Allow: /housekeeping-admin/
+Allow: /housekeeping-admin/request-quote
+Allow: /housekeeping-admin/portal
+Disallow: /housekeeping-admin/dashboard
+Disallow: /housekeeping-admin/customers
+Disallow: /housekeeping-admin/jobs
+Disallow: /housekeeping-admin/login
+
+Sitemap: https://YOUR_USER.github.io/housekeeping-admin/sitemap.xml

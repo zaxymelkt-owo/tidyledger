@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+/* Nordic Ghostly Green — pronounced mist, forest, purple */
+@theme {
+  --font-display: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --color-paper: #E4EFE9;
+  --color-paper-raised: #F3F9F6;
+  --color-ink: #0F1F1A;
+  --color-slate: #4A635A;
+  --color-sage: #5F9B82;
+  --color-sage-deep: #1E4D3E;
+  --color-mist: #A8CFBC;
+  --color-brass: #7B68A6;
+  --color-brass-deep: #5A4A82;
+  --color-lilac: #C4B3E0;
+  --color-clay: #B8433F;
+  --color-line: #B9D0C4;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  background-image:
+    radial-gradient(ellipse 100% 70% at 0% -5%, rgba(123, 104, 166, 0.22), transparent 55%),
+    radial-gradient(ellipse 80% 55% at 100% 0%, rgba(30, 77, 62, 0.2), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(168, 207, 188, 0.35), transparent 55%),
+    linear-gradient(180deg, #dcebe3 0%, var(--color-paper) 35%, #e8f2ec 100%);
+  background-attachment: fixed;
+  min-height: 100dvh;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.ticket-card {
+  position: relative;
+  background: linear-gradient(180deg, #ffffff 0%, var(--color-paper-raised) 100%);
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  overflow: visible;
+  box-shadow:
+    0 1px 0 rgba(123, 104, 166, 0.12),
+    0 10px 28px -10px rgba(15, 31, 26, 0.14);
+}
+
+.ticket-card::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 14px;
+  right: 14px;
+  height: 0;
+  border-top: 2px dashed color-mix(in srgb, var(--color-lilac) 55%, var(--color-line));
+}
+
+.ticket-card::after {
+  content: "";
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  background: linear-gradient(135deg, var(--color-mist), var(--color-lilac));
+  border-radius: 50%;
+  border: 2px solid var(--color-paper-raised);
+  box-shadow: 0 0 0 1px var(--color-line);
+}
+
+.ticket-number {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.07em;
+  color: var(--color-brass-deep);
+  text-transform: uppercase;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-scroll table {
+  min-width: 640px;
+}
+
+.safe-pb {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+
+::selection {
+  background: var(--color-brass);
+  color: white;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brass);
+  outline-offset: 2px;
+}
+
+/* Brand gradient text */
+.brand-gradient {
+  background: linear-gradient(120deg, var(--color-sage-deep) 0%, var(--color-brass) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Purple accent chip */
+.chip-purple {
+  background: color-mix(in srgb, var(--color-brass) 14%, white);
+  color: var(--color-brass-deep);
+  border: 1px solid color-mix(in srgb, var(--color-brass) 28%, transparent);
+}
+
+.chip-green {
+  background: color-mix(in srgb, var(--color-sage) 16%, white);
+  color: var(--color-sage-deep);
+  border: 1px solid color-mix(in srgb, var(--color-sage) 30%, transparent);
+}
+
+@media (max-width: 767px) {
+  .admin-main-pad {
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+  }
+}

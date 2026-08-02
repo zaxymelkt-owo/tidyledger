@@ -8,7 +8,7 @@ type Props = {
 }
 
 const SITE = 'TidyLedger'
-const BASE = 'https://YOUR_USER.github.io/housekeeping-admin'
+const BASE = 'https://tidyledger.github.io/tidyledger'
 
 /** Lightweight document head updates for public pages (SPA-friendly). */
 export default function Seo({

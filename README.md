@@ -41,7 +41,7 @@ The app will be running at `http://localhost:5173`. Sign in with the user you cr
    - `VITE_SUPABASE_ANON_KEY`
 4. Push to `main` — the included workflow (`.github/workflows/deploy.yml`) builds and deploys automatically.
 
-If your repo isn't named `housekeeping-admin`, update the `base` in `vite.config.ts` and the `basename` in
+If your repo isn't named `tidyledger`, update the `base` in `vite.config.ts` and the `basename` in
 `src/App.tsx` to match your actual repo name (GitHub Pages serves project sites from `/<repo-name>/`).
 
 ## Project structure
@@ -127,7 +127,7 @@ supabase link --project-ref YOUR_PROJECT_REF
 
 # Set secrets (use test keys first)
 supabase secrets set STRIPE_SECRET_KEY=sk_test_...
-supabase secrets set SITE_URL=https://YOUR_USER.github.io/housekeeping-admin
+supabase secrets set SITE_URL=https://tidyledger.github.io/tidyledger
 # SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are usually auto-injected;
 # if not, set them from Project Settings → API
 

@@ -1,7 +1,7 @@
 // Supabase Edge Function: create-checkout-session
 // Deploy: supabase functions deploy create-checkout-session --no-verify-jwt
 // Secrets: STRIPE_SECRET_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
-// Optional: SITE_URL (e.g. https://youruser.github.io/housekeeping-admin)
+// Optional: SITE_URL (e.g. https://youruser.github.io/tidyledger)
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1'
 import Stripe from 'https://esm.sh/stripe@17.7.0?target=deno'

@@ -1,11 +1,11 @@
 User-agent: *
 Allow: /
-Allow: /housekeeping-admin/
-Allow: /housekeeping-admin/request-quote
-Allow: /housekeeping-admin/portal
-Disallow: /housekeeping-admin/dashboard
-Disallow: /housekeeping-admin/customers
-Disallow: /housekeeping-admin/jobs
-Disallow: /housekeeping-admin/login
+Allow: /tidyledger/
+Allow: /tidyledger/request-quote
+Allow: /tidyledger/portal
+Disallow: /tidyledger/dashboard
+Disallow: /tidyledger/customers
+Disallow: /tidyledger/jobs
+Disallow: /tidyledger/login
 
-Sitemap: https://YOUR_USER.github.io/housekeeping-admin/sitemap.xml
+Sitemap: https://tidyledger.github.io/tidyledger/sitemap.xml

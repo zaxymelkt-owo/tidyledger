@@ -1,0 +1,25 @@
+{
+  "name": "TidyLedger Housekeeping",
+  "short_name": "TidyLedger",
+  "description": "Housekeeping admin — jobs, field check-in, photos, and signatures",
+  "start_url": "/housekeeping-admin/",
+  "scope": "/housekeeping-admin/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#EEF3F0",
+  "theme_color": "#2F5C4C",
+  "icons": [
+    {
+      "src": "/housekeeping-admin/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/housekeeping-admin/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

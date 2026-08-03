@@ -3,7 +3,6 @@ import { useNavigate, Link } from 'react-router-dom'
 import { Field, Input } from '../../components/ui/Field'
 import Button from '../../components/ui/Button'
 import { supabase } from '../../lib/supabase'
-import type { Customer } from '../../types'
 import Seo from '../../components/Seo'
 import { useAuth } from '../../contexts/AuthContext'
 
@@ -19,7 +18,21 @@ export type PortalSession = {
   claimed?: boolean
 }
 
-export function savePortalCustomer(c: Customer & { portal_code: string }) {
+// Shape returned by the portal_login RPC — deliberately narrow. It never
+// includes gate_code/alarm_code/notes/etc; the portal UI has no need for
+// them and shouldn't be fetching them client-side.
+type PortalLoginResult = {
+  id: string
+  first_name: string
+  last_name: string
+  email: string | null
+  portal_code: string | null
+  business_id: string | null
+  auth_user_id: string | null
+  account_claimed_at: string | null
+}
+
+export function savePortalCustomer(c: PortalLoginResult & { portal_code: string }) {
   const session: PortalSession = {
     id: c.id,
     first_name: c.first_name,
@@ -55,7 +68,7 @@ export default function PortalLogin() {
   const [code, setCode] = useState('')
   const [password, setPassword] = useState('')
   const [mode, setMode] = useState<'code' | 'password' | 'claim'>('code')
-  const [pendingClaim, setPendingClaim] = useState<Customer | null>(null)
+  const [pendingClaim, setPendingClaim] = useState<PortalLoginResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [info, setInfo] = useState<string | null>(null)
@@ -67,15 +80,12 @@ export default function PortalLogin() {
     setInfo(null)
     try {
       const { data, error } = await supabase
-        .from('customers')
-        .select('*')
-        .eq('portal_enabled', true)
-        .eq('portal_code', code.trim())
-        .ilike('email', email.trim())
+        .rpc('portal_login', { p_email: email.trim(), p_portal_code: code.trim() })
+        .returns<PortalLoginResult[]>()
         .maybeSingle()
 
       if (error) throw error
-      if (!data || !data.portal_code) {
+      if (!data) {
         setError('No portal account found for that email and access code.')
         return
       }
@@ -90,7 +100,7 @@ export default function PortalLogin() {
 
       // First-time code success → offer password claim
       setPendingClaim(data)
-      savePortalCustomer({ ...data, portal_code: data.portal_code })
+      savePortalCustomer({ ...data, portal_code: data.portal_code ?? code.trim() })
       setMode('claim')
       setInfo('Code accepted. Create a password so you can sign in next time without the portal code.')
     } catch (err) {

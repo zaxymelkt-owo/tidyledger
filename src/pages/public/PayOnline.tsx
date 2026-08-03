@@ -30,9 +30,8 @@ export default function PayOnline() {
       const tick = async () => {
         attempts += 1
         const { data } = await supabase
-          .from('payments')
-          .select('*')
-          .eq('access_token', token!)
+          .rpc('get_payment_by_token', { p_token: token! })
+          .returns<Payment[]>()
           .maybeSingle()
         if (data?.status === 'succeeded') {
           setPayment(data)
@@ -42,8 +41,9 @@ export default function PayOnline() {
         if (attempts < 8) setTimeout(tick, 1500)
         else if (data) {
           // Show optimistic success after Stripe redirect even if webhook lags
+          // (status can't be 'succeeded' here — that already returned above)
           setPayment(data)
-          setSuccess(data.status === 'succeeded' || statusParam === 'success')
+          setSuccess(statusParam === 'success')
         }
       }
       tick()
@@ -54,9 +54,8 @@ export default function PayOnline() {
     setLoading(true)
     setError(null)
     const { data, error } = await supabase
-      .from('payments')
-      .select('*')
-      .eq('access_token', token)
+      .rpc('get_payment_by_token', { p_token: token ?? '' })
+      .returns<Payment[]>()
       .maybeSingle()
 
     if (error) setError(error.message)

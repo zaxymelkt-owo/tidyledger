@@ -56,16 +56,7 @@ export default function Hub() {
                     {registerOpen && (
                       <>
                         <div className="fixed inset-0 z-30" onClick={() => setRegisterOpen(false)} />
-                        <div
-  className="
-    absolute
-    top-full mt-2
-    left-1/2 -translate-x-1/2
-    sm:left-auto sm:right-0 sm:translate-x-0
-    w-64 max-w-[calc(100vw-2rem)]
-    ticket-card p-2 z-40 shadow-lg
-  "
->
+                        <div className="absolute right-0 mt-2 w-64 ticket-card p-2 z-40 shadow-lg">
                           <Link
                             to="/register"
                             className="block px-3 py-2.5 rounded-lg text-sm font-medium text-ink hover:bg-sage/10"
@@ -107,16 +98,7 @@ export default function Hub() {
                     {loginOpen && (
                       <>
                         <div className="fixed inset-0 z-30" onClick={() => setLoginOpen(false)} />
-                        <div
-  className="
-    absolute
-    top-full mt-2
-    left-1/2 -translate-x-1/2
-    sm:left-auto sm:right-0 sm:translate-x-0
-    w-64 max-w-[calc(100vw-2rem)]
-    ticket-card p-2 z-40 shadow-lg
-  "
->
+                        <div className="absolute right-0 mt-2 w-64 ticket-card p-2 z-40 shadow-lg">
                           <Link
                             to="/login?intent=owner"
                             className="block px-3 py-2.5 rounded-lg text-sm font-medium text-ink hover:bg-sage/10"

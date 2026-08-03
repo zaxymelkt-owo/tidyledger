@@ -9,6 +9,7 @@
 
   --color-paper: #E4EFE9;
   --color-paper-raised: #F3F9F6;
+  --color-surface: #FFFFFF;
   --color-ink: #0F1F1A;
   --color-slate: #4A635A;
   --color-sage: #5F9B82;
@@ -21,6 +22,43 @@
   --color-line: #B9D0C4;
 }
 
+/* Ambient gradient stops used behind the app shell. Kept separate from the
+   @theme color tokens above since they're only ever consumed as raw CSS,
+   never as Tailwind utilities. */
+:root {
+  --grad-brass-glow: rgba(123, 104, 166, 0.22);
+  --grad-sage-glow: rgba(30, 77, 62, 0.2);
+  --grad-mist-glow: rgba(168, 207, 188, 0.35);
+  --grad-base-top: #dcebe3;
+  --grad-base-bottom: #e8f2ec;
+}
+
+/* Ghostly Green — Night. Same family, re-tuned for a dark canvas: deeper
+   forest paper, brighter sage/brass so accents still pop, softened lilac
+   and clay so nothing turns neon at low luminance. Toggled by adding
+   `.dark` to <html> — see src/contexts/ThemeContext.tsx. */
+.dark {
+  --color-paper: #0B1512;
+  --color-paper-raised: #132119;
+  --color-surface: #17251D;
+  --color-ink: #E9F4EC;
+  --color-slate: #93AC9F;
+  --color-sage: #6FC59D;
+  --color-sage-deep: #2F7A5A;
+  --color-mist: #24402F;
+  --color-brass: #A48EE0;
+  --color-brass-deep: #8A76CC;
+  --color-lilac: #D9CBF2;
+  --color-clay: #E2726C;
+  --color-line: #223228;
+
+  --grad-brass-glow: rgba(164, 142, 224, 0.16);
+  --grad-sage-glow: rgba(111, 197, 157, 0.14);
+  --grad-mist-glow: rgba(36, 64, 47, 0.55);
+  --grad-base-top: #0a1310;
+  --grad-base-bottom: #0d1815;
+}
+
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
@@ -31,12 +69,13 @@ body {
   color: var(--color-ink);
   font-family: var(--font-body);
   background-image:
-    radial-gradient(ellipse 100% 70% at 0% -5%, rgba(123, 104, 166, 0.22), transparent 55%),
-    radial-gradient(ellipse 80% 55% at 100% 0%, rgba(30, 77, 62, 0.2), transparent 50%),
-    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(168, 207, 188, 0.35), transparent 55%),
-    linear-gradient(180deg, #dcebe3 0%, var(--color-paper) 35%, #e8f2ec 100%);
+    radial-gradient(ellipse 100% 70% at 0% -5%, var(--grad-brass-glow), transparent 55%),
+    radial-gradient(ellipse 80% 55% at 100% 0%, var(--grad-sage-glow), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 50% 100%, var(--grad-mist-glow), transparent 55%),
+    linear-gradient(180deg, var(--grad-base-top) 0%, var(--color-paper) 35%, var(--grad-base-bottom) 100%);
   background-attachment: fixed;
   min-height: 100dvh;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .font-display {
@@ -50,7 +89,7 @@ body {
 
 .ticket-card {
   position: relative;
-  background: linear-gradient(180deg, #ffffff 0%, var(--color-paper-raised) 100%);
+  background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-paper-raised) 100%);
   border: 1px solid var(--color-line);
   border-radius: 14px;
   overflow: visible;
@@ -124,13 +163,13 @@ body {
 
 /* Purple accent chip */
 .chip-purple {
-  background: color-mix(in srgb, var(--color-brass) 14%, white);
+  background: color-mix(in srgb, var(--color-brass) 14%, var(--color-surface));
   color: var(--color-brass-deep);
   border: 1px solid color-mix(in srgb, var(--color-brass) 28%, transparent);
 }
 
 .chip-green {
-  background: color-mix(in srgb, var(--color-sage) 16%, white);
+  background: color-mix(in srgb, var(--color-sage) 16%, var(--color-surface));
   color: var(--color-sage-deep);
   border: 1px solid color-mix(in srgb, var(--color-sage) 30%, transparent);
 }

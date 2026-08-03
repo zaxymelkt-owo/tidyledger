@@ -1,25 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
-
-const links = [
-  { to: '/dashboard', label: 'Dashboard' },
-  { to: '/jobs', label: 'Jobs' },
-  { to: '/customers', label: 'Customers' },
-  { to: '/quotes', label: 'Quotes' },
-  { to: '/quote-requests', label: 'Inbox' },
-  { to: '/employees', label: 'Employees' },
-  { to: '/team', label: 'Team logins' },
-  { to: '/payroll', label: 'Payroll' },
-  { to: '/my-pay', label: 'My pay' },
-  { to: '/inventory', label: 'Inventory' },
-  { to: '/finances', label: 'Finances' },
-  { to: '/payments', label: 'Payments' },
-  { to: '/disputes', label: 'Disputes' },
-  { to: '/tax-settings', label: 'Tax' },
-  { to: '/roles', label: 'Roles' },
-  { to: '/reviews', label: 'Reviews' },
-  { to: '/reports', label: 'Reports' },
-]
+import ThemeToggle from '../ui/ThemeToggle'
+import { flatNav } from './navConfig'
 
 export default function MobileNav({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { session, signOut, isPlatformAdmin } = useAuth()
@@ -45,16 +27,19 @@ export default function MobileNav({ open, onClose }: { open: boolean; onClose: (
           <NavLink to="/" onClick={onClose} className="font-display font-semibold">
             <span className="brand-gradient">TidyLedger</span>
           </NavLink>
-          <button
-            type="button"
-            aria-label="Close menu"
-            onClick={onClose}
-            className="w-10 h-10 rounded-lg flex items-center justify-center text-slate hover:bg-paper"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            <button
+              type="button"
+              aria-label="Close menu"
+              onClick={onClose}
+              className="w-10 h-10 rounded-lg flex items-center justify-center text-slate hover:bg-paper"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5">
@@ -67,20 +52,23 @@ export default function MobileNav({ open, onClose }: { open: boolean; onClose: (
               Platform master
             </NavLink>
           )}
-          {links.map(({ to, label }) => (
+          {flatNav.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
               end={to === '/dashboard'}
               onClick={onClose}
               className={({ isActive }) =>
-                `block px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                `flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive
                     ? 'bg-sage/15 text-sage-deep'
                     : 'text-slate hover:bg-paper hover:text-ink'
                 }`
               }
             >
+              <span className="opacity-90">
+                <Icon />
+              </span>
               {label}
             </NavLink>
           ))}

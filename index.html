@@ -39,8 +39,9 @@
     <meta name="twitter:image" content="https://zaxymelkt-owo.github.io/tidyledger/icons/og-cover.svg" />
 
     <!-- PWA / mobile -->
-    <meta name="theme-color" content="#1E4D3E" />
-    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#1E4D3E" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0B1512" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -48,6 +49,18 @@
     <link rel="icon" type="image/svg+xml" href="/tidyledger/favicon.svg" />
     <link rel="apple-touch-icon" href="/tidyledger/icons/icon-192.svg" />
     <link rel="manifest" href="/tidyledger/manifest.webmanifest" />
+
+    <!-- Apply saved/system theme before first paint to avoid a flash -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('tidyledger-theme')
+          var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches
+          if (dark) document.documentElement.classList.add('dark')
+          document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
+        } catch (e) {}
+      })()
+    </script>
 
     <!-- Preconnect for fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

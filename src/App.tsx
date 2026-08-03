@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
+import { ThemeProvider } from './contexts/ThemeContext'
 import RequireAuth from './components/RequireAuth'
 import AppLayout from './components/layout/AppLayout'
 import Hub from './pages/public/Hub'
@@ -52,86 +53,88 @@ function PlatformOnly({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <BrowserRouter basename="/tidyledger">
-      <AuthProvider>
-        <Routes>
-          <Route path="/" element={<Hub />} />
-          <Route path="/request-quote" element={<RequestQuote />} />
-          <Route path="/pay/:token" element={<PayOnline />} />
-          <Route path="/review/:token" element={<LeaveReview />} />
-          <Route path="/portal" element={<PortalLogin />} />
-          <Route path="/portal/dashboard" element={<PortalDashboard />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<RegisterBusiness />} />
-          <Route path="/invite/:token" element={<AcceptInvite />} />
+    <ThemeProvider>
+      <BrowserRouter basename="/tidyledger">
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Hub />} />
+            <Route path="/request-quote" element={<RequestQuote />} />
+            <Route path="/pay/:token" element={<PayOnline />} />
+            <Route path="/review/:token" element={<LeaveReview />} />
+            <Route path="/portal" element={<PortalLogin />} />
+            <Route path="/portal/dashboard" element={<PortalDashboard />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<RegisterBusiness />} />
+            <Route path="/invite/:token" element={<AcceptInvite />} />
 
-          <Route
-            path="/*"
-            element={
-              <RequireAuth>
-                <StaffOnly>
-                  <AppLayout>
-                    <Routes>
-                      <Route path="/dashboard" element={<Dashboard />} />
-                      <Route path="/customers" element={<Customers />} />
-                      <Route path="/jobs" element={<Jobs />} />
-                      <Route path="/jobs/:jobId/field" element={<JobField />} />
-                      <Route path="/quotes" element={<Quotes />} />
-                      <Route path="/quote-requests" element={<QuoteRequests />} />
-                      <Route path="/employees" element={<Employees />} />
-                      <Route path="/team" element={<Team />} />
-                      <Route path="/payroll" element={<Payroll />} />
-                      <Route path="/my-pay" element={<MyPay />} />
-                      <Route path="/commission-terms" element={<CommissionTerms />} />
-                      <Route path="/disputes" element={<CommissionDisputes />} />
-                      <Route path="/tax-settings" element={<TaxSettings />} />
-                      <Route path="/roles" element={<RoleHierarchy />} />
-                      <Route path="/inventory" element={<Inventory />} />
-                      <Route path="/finances" element={<Finances />} />
-                      <Route path="/payments" element={<Payments />} />
-                      <Route path="/reviews" element={<Reviews />} />
-                      <Route path="/reports" element={<Reports />} />
+            <Route
+              path="/*"
+              element={
+                <RequireAuth>
+                  <StaffOnly>
+                    <AppLayout>
+                      <Routes>
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/customers" element={<Customers />} />
+                        <Route path="/jobs" element={<Jobs />} />
+                        <Route path="/jobs/:jobId/field" element={<JobField />} />
+                        <Route path="/quotes" element={<Quotes />} />
+                        <Route path="/quote-requests" element={<QuoteRequests />} />
+                        <Route path="/employees" element={<Employees />} />
+                        <Route path="/team" element={<Team />} />
+                        <Route path="/payroll" element={<Payroll />} />
+                        <Route path="/my-pay" element={<MyPay />} />
+                        <Route path="/commission-terms" element={<CommissionTerms />} />
+                        <Route path="/disputes" element={<CommissionDisputes />} />
+                        <Route path="/tax-settings" element={<TaxSettings />} />
+                        <Route path="/roles" element={<RoleHierarchy />} />
+                        <Route path="/inventory" element={<Inventory />} />
+                        <Route path="/finances" element={<Finances />} />
+                        <Route path="/payments" element={<Payments />} />
+                        <Route path="/reviews" element={<Reviews />} />
+                        <Route path="/reports" element={<Reports />} />
 
-                      <Route
-                        path="/platform"
-                        element={
-                          <PlatformOnly>
-                            <PlatformDashboard />
-                          </PlatformOnly>
-                        }
-                      />
-                      <Route
-                        path="/platform/applications"
-                        element={
-                          <PlatformOnly>
-                            <PlatformApplications />
-                          </PlatformOnly>
-                        }
-                      />
-                      <Route
-                        path="/platform/businesses"
-                        element={
-                          <PlatformOnly>
-                            <PlatformBusinesses />
-                          </PlatformOnly>
-                        }
-                      />
-                      <Route
-                        path="/platform/commissions"
-                        element={
-                          <PlatformOnly>
-                            <PlatformCommissions />
-                          </PlatformOnly>
-                        }
-                      />
-                    </Routes>
-                  </AppLayout>
-                </StaffOnly>
-              </RequireAuth>
-            }
-          />
-        </Routes>
-      </AuthProvider>
-    </BrowserRouter>
+                        <Route
+                          path="/platform"
+                          element={
+                            <PlatformOnly>
+                              <PlatformDashboard />
+                            </PlatformOnly>
+                          }
+                        />
+                        <Route
+                          path="/platform/applications"
+                          element={
+                            <PlatformOnly>
+                              <PlatformApplications />
+                            </PlatformOnly>
+                          }
+                        />
+                        <Route
+                          path="/platform/businesses"
+                          element={
+                            <PlatformOnly>
+                              <PlatformBusinesses />
+                            </PlatformOnly>
+                          }
+                        />
+                        <Route
+                          path="/platform/commissions"
+                          element={
+                            <PlatformOnly>
+                              <PlatformCommissions />
+                            </PlatformOnly>
+                          }
+                        />
+                      </Routes>
+                    </AppLayout>
+                  </StaffOnly>
+                </RequireAuth>
+              }
+            />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   )
 }

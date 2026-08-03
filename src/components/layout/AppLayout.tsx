@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import OfflineBanner from '../OfflineBanner'
 import MobileNav from './MobileNav'
+import ThemeToggle from '../ui/ThemeToggle'
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const [navOpen, setNavOpen] = useState(false)
@@ -34,7 +35,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           <Link to="/" className="font-display font-semibold text-base">
             <span className="brand-gradient">TidyLedger</span>
           </Link>
-          <span className="w-10" />
+          <ThemeToggle />
         </div>
 
         <div className="flex-1 flex flex-col min-h-0 admin-main-pad">{children}</div>

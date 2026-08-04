@@ -5,40 +5,41 @@ import Button from '../components/ui/Button'
 import Modal from '../components/ui/Modal'
 import { Field, Input, Textarea, Select } from '../components/ui/Field'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../contexts/AuthContext'
 import type {
   Customer,
   Quote,
   QuoteFormInput,
   QuoteFrequency,
+  QuotePricingAddon,
   QuoteStatus,
   ServiceType,
 } from '../types'
 
-// Pricing engine — tunable rates for a typical residential cleaning business
-const BASE_RATES: Record<ServiceType, number> = {
-  standard: 0.12,           // per sq ft
+const DEFAULT_BASE_RATES: Record<ServiceType, number> = {
+  standard: 0.12,
   deep: 0.20,
   move_in_out: 0.25,
   post_construction: 0.30,
   airbnb: 0.15,
 }
 
-const BEDROOM_ADDON = 15
-const BATHROOM_ADDON = 25
-const FREQUENCY_DISCOUNT: Record<QuoteFrequency, number> = {
+const DEFAULT_BEDROOM_ADDON = 15
+const DEFAULT_BATHROOM_ADDON = 25
+const DEFAULT_FREQUENCY_DISCOUNTS: Record<QuoteFrequency, number> = {
   one_time: 0,
   weekly: 15,
   biweekly: 10,
   monthly: 5,
 }
 
-const ADDONS = [
-  { id: 'fridge', label: 'Inside fridge', price: 40 },
-  { id: 'oven', label: 'Inside oven', price: 35 },
-  { id: 'windows', label: 'Interior windows', price: 50 },
-  { id: 'cabinets', label: 'Inside cabinets', price: 45 },
-  { id: 'laundry', label: 'Laundry (per load)', price: 20 },
-  { id: 'pets', label: 'Pet hair deep clean', price: 30 },
+const DEFAULT_ADDONS: Array<QuotePricingAddon> = [
+  { id: 'fridge', created_at: '', business_id: '', label: 'Inside fridge', price: 40, description: null, sort_order: 0, active: true, is_multiple: false, quantity_label: null, quantity_default: 1 },
+  { id: 'oven', created_at: '', business_id: '', label: 'Inside oven', price: 35, description: null, sort_order: 1, active: true, is_multiple: false, quantity_label: null, quantity_default: 1 },
+  { id: 'windows', created_at: '', business_id: '', label: 'Interior windows', price: 50, description: null, sort_order: 2, active: true, is_multiple: false, quantity_label: null, quantity_default: 1 },
+  { id: 'cabinets', created_at: '', business_id: '', label: 'Inside cabinets', price: 45, description: null, sort_order: 3, active: true, is_multiple: false, quantity_label: null, quantity_default: 1 },
+  { id: 'laundry', created_at: '', business_id: '', label: 'Laundry (per load)', price: 20, description: null, sort_order: 4, active: true, is_multiple: true, quantity_label: 'loads', quantity_default: 1 },
+  { id: 'pets', created_at: '', business_id: '', label: 'Pet hair deep clean', price: 30, description: null, sort_order: 6, active: true, is_multiple: false, quantity_label: null, quantity_default: 1 },
 ]
 
 type ModalState = { mode: 'view'; quote: Quote } | null
@@ -50,17 +51,25 @@ function calculateQuote(input: {
   service_type: ServiceType
   frequency: QuoteFrequency
   selectedAddons: string[]
+  addonQuantities: Record<string, number>
   discount_pct: number
+  baseRates: Record<ServiceType, number>
+  bedroomAddon: number
+  bathroomAddon: number
+  frequencyDiscounts: Record<QuoteFrequency, number>
+  addons: QuotePricingAddon[]
 }) {
-  const base = (input.square_footage || 0) * BASE_RATES[input.service_type]
+  const base = (input.square_footage || 0) * input.baseRates[input.service_type]
   const roomAddons =
-    (input.bedrooms || 0) * BEDROOM_ADDON + (input.bathrooms || 0) * BATHROOM_ADDON
-  const addonsTotal = ADDONS.filter((a) => input.selectedAddons.includes(a.id)).reduce(
-    (s, a) => s + a.price,
-    0
-  )
+    (input.bedrooms || 0) * input.bedroomAddon + (input.bathrooms || 0) * input.bathroomAddon
+  const addonsTotal = input.addons
+    .filter((a) => input.selectedAddons.includes(a.id))
+    .reduce((s, a) => {
+      const quantity = a.is_multiple ? Math.max(1, input.addonQuantities[a.id] ?? a.quantity_default ?? 1) : 1
+      return s + a.price * quantity
+    }, 0)
   const subtotal = base + roomAddons + addonsTotal
-  const freqDiscount = FREQUENCY_DISCOUNT[input.frequency]
+  const freqDiscount = input.frequencyDiscounts[input.frequency]
   const extraDiscount = input.discount_pct || 0
   const totalDiscountPct = Math.min(freqDiscount + extraDiscount, 40)
   const total = Math.round(subtotal * (1 - totalDiscountPct / 100) * 100) / 100
@@ -81,8 +90,10 @@ const statusStyles: Record<QuoteStatus, string> = {
 }
 
 export default function Quotes() {
+  const { business } = useAuth()
   const [quotes, setQuotes] = useState<Quote[]>([])
   const [customers, setCustomers] = useState<Customer[]>([])
+  const [pricingAddons, setPricingAddons] = useState<QuotePricingAddon[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [modal, setModal] = useState<ModalState>(null)
@@ -96,6 +107,7 @@ export default function Quotes() {
   const [serviceType, setServiceType] = useState<ServiceType>('standard')
   const [frequency, setFrequency] = useState<QuoteFrequency>('one_time')
   const [selectedAddons, setSelectedAddons] = useState<string[]>([])
+  const [addonQuantities, setAddonQuantities] = useState<Record<string, number>>({})
   const [extraDiscount, setExtraDiscount] = useState(0)
   const [customerId, setCustomerId] = useState('')
   const [customerName, setCustomerName] = useState('')
@@ -103,20 +115,55 @@ export default function Quotes() {
 
   useEffect(() => {
     loadAll()
-  }, [])
+  }, [business?.id])
 
   async function loadAll() {
     setLoading(true)
     setError(null)
-    const [quotesRes, customersRes] = await Promise.all([
+    const [quotesRes, customersRes, addonsRes] = await Promise.all([
       supabase.from('quotes').select('*').order('created_at', { ascending: false }),
       supabase.from('customers').select('*').order('last_name', { ascending: true }),
+      business?.id
+        ? supabase
+            .from('quote_pricing_addons')
+            .select('*')
+            .eq('business_id', business.id)
+            .eq('active', true)
+            .order('sort_order', { ascending: true })
+        : Promise.resolve({ data: [] as QuotePricingAddon[], error: null }),
     ])
     if (quotesRes.error) setError(quotesRes.error.message)
     else setQuotes(quotesRes.data ?? [])
     setCustomers(customersRes.data ?? [])
+    setPricingAddons((addonsRes.data as QuotePricingAddon[]) ?? [])
     setLoading(false)
   }
+
+  const baseRates = useMemo(
+    () => ({
+      standard: business?.quote_base_rate_standard ?? DEFAULT_BASE_RATES.standard,
+      deep: business?.quote_base_rate_deep ?? DEFAULT_BASE_RATES.deep,
+      move_in_out: business?.quote_base_rate_move_in_out ?? DEFAULT_BASE_RATES.move_in_out,
+      post_construction:
+        business?.quote_base_rate_post_construction ?? DEFAULT_BASE_RATES.post_construction,
+      airbnb: business?.quote_base_rate_airbnb ?? DEFAULT_BASE_RATES.airbnb,
+    }),
+    [business]
+  )
+
+  const bedroomAddon = business?.quote_bedroom_addon ?? DEFAULT_BEDROOM_ADDON
+  const bathroomAddon = business?.quote_bathroom_addon ?? DEFAULT_BATHROOM_ADDON
+  const frequencyDiscounts = useMemo(
+    () => ({
+      one_time: DEFAULT_FREQUENCY_DISCOUNTS.one_time,
+      weekly: business?.quote_discount_weekly ?? DEFAULT_FREQUENCY_DISCOUNTS.weekly,
+      biweekly: business?.quote_discount_biweekly ?? DEFAULT_FREQUENCY_DISCOUNTS.biweekly,
+      monthly: business?.quote_discount_monthly ?? DEFAULT_FREQUENCY_DISCOUNTS.monthly,
+    }),
+    [business]
+  )
+
+  const availableAddons = pricingAddons.length > 0 ? pricingAddons : DEFAULT_ADDONS
 
   const calc = useMemo(
     () =>
@@ -127,15 +174,38 @@ export default function Quotes() {
         service_type: serviceType,
         frequency,
         selectedAddons,
+        addonQuantities,
         discount_pct: extraDiscount,
+        baseRates,
+        bedroomAddon,
+        bathroomAddon,
+        frequencyDiscounts,
+        addons: availableAddons,
       }),
-    [sqft, bedrooms, bathrooms, serviceType, frequency, selectedAddons, extraDiscount]
+    [sqft, bedrooms, bathrooms, serviceType, frequency, selectedAddons, addonQuantities, extraDiscount, baseRates, bedroomAddon, bathroomAddon, frequencyDiscounts, availableAddons]
   )
 
   function toggleAddon(id: string) {
-    setSelectedAddons((prev) =>
-      prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]
-    )
+    const addon = availableAddons.find((item) => item.id === id)
+    setSelectedAddons((prev) => {
+      if (prev.includes(id)) {
+        setAddonQuantities((qtyPrev) => {
+          const next = { ...qtyPrev }
+          delete next[id]
+          return next
+        })
+        return prev.filter((a) => a !== id)
+      }
+
+      if (addon?.is_multiple) {
+        setAddonQuantities((qtyPrev) => ({
+          ...qtyPrev,
+          [id]: addon.quantity_default ?? 1,
+        }))
+      }
+
+      return [...prev, id]
+    })
   }
 
   function fillFromCustomer(id: string) {
@@ -279,24 +349,46 @@ export default function Quotes() {
               <div>
                 <span className="block text-xs font-medium uppercase tracking-wide text-slate mb-2">Add-ons</span>
                 <div className="grid grid-cols-2 gap-2">
-                  {ADDONS.map((a) => (
-                    <label
+                  {availableAddons.map((a) => (
+                    <div
                       key={a.id}
-                      className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm cursor-pointer transition-colors ${
+                      className={`rounded-lg border px-3 py-2 text-sm transition-colors ${
                         selectedAddons.includes(a.id)
                           ? 'border-sage bg-sage/5 text-sage-deep'
                           : 'border-line hover:border-sage/40'
                       }`}
                     >
-                      <input
-                        type="checkbox"
-                        checked={selectedAddons.includes(a.id)}
-                        onChange={() => toggleAddon(a.id)}
-                        className="accent-sage-deep"
-                      />
-                      <span className="flex-1">{a.label}</span>
-                      <span className="font-mono-num text-xs">${a.price}</span>
-                    </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedAddons.includes(a.id)}
+                          onChange={() => toggleAddon(a.id)}
+                          className="accent-sage-deep"
+                        />
+                        <span className="flex-1">{a.label}</span>
+                        <span className="font-mono-num text-xs">${a.price}</span>
+                      </label>
+                      {a.is_multiple && selectedAddons.includes(a.id) && (
+                        <div className="mt-2 flex items-center gap-2 pl-6">
+                          <label className="text-[11px] uppercase tracking-wide text-slate">
+                            {a.quantity_label || 'quantity'}
+                          </label>
+                          <Input
+                            type="number"
+                            min="1"
+                            step="1"
+                            value={addonQuantities[a.id] ?? a.quantity_default ?? 1}
+                            onChange={(e) =>
+                              setAddonQuantities((prev) => ({
+                                ...prev,
+                                [a.id]: Math.max(1, Number(e.target.value) || 1),
+                              }))
+                            }
+                            className="max-w-24"
+                          />
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
               </div>
@@ -326,7 +418,7 @@ export default function Quotes() {
 
                 <dl className="space-y-2 text-sm mb-6">
                   <div className="flex justify-between">
-                    <dt className="text-slate">Base ({sqft} sq ft × ${BASE_RATES[serviceType]})</dt>
+                    <dt className="text-slate">Base ({sqft} sq ft × ${baseRates[serviceType].toFixed(2)})</dt>
                     <dd className="font-mono-num">${calc.base_rate.toFixed(2)}</dd>
                   </div>
                   <div className="flex justify-between">

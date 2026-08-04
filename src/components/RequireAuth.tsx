@@ -3,7 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function RequireAuth({ children }: { children: ReactNode }) {
-  const { session, loading } = useAuth()
+  const { session, loading, profile } = useAuth()
   const location = useLocation()
 
   if (loading) {
@@ -16,6 +16,10 @@ export default function RequireAuth({ children }: { children: ReactNode }) {
 
   if (!session) {
     return <Navigate to="/" replace state={{ from: location.pathname }} />
+  }
+
+  if (profile && !profile.active && profile.role !== 'owner' && location.pathname !== '/my-pay') {
+    return <Navigate to="/my-pay" replace state={{ from: location.pathname }} />
   }
 
   return <>{children}</>

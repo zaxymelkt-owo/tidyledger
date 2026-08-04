@@ -15,8 +15,12 @@ const statusStyles: Record<QuoteRequestStatus, string> = {
   converted: 'bg-sage/10 text-sage-deep',
 }
 
+type QuoteRequestRow = QuoteRequest & {
+  businesses?: { name: string } | null
+}
+
 export default function QuoteRequests() {
-  const [items, setItems] = useState<QuoteRequest[]>([])
+  const [items, setItems] = useState<QuoteRequestRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<'all' | QuoteRequestStatus>('all')
@@ -33,7 +37,7 @@ export default function QuoteRequests() {
     setError(null)
     const { data, error } = await supabase
       .from('quote_requests')
-      .select('*')
+      .select('*, businesses(name)')
       .order('created_at', { ascending: false })
     if (error) setError(error.message)
     else setItems(data ?? [])
@@ -136,6 +140,7 @@ export default function QuoteRequests() {
               <tr className="border-b border-line text-left text-xs uppercase tracking-wide text-slate">
                 <th className="px-5 py-3 font-medium">Received</th>
                 <th className="px-5 py-3 font-medium">Name</th>
+                <th className="px-5 py-3 font-medium">Business</th>
                 <th className="px-5 py-3 font-medium">Contact</th>
                 <th className="px-5 py-3 font-medium">Service</th>
                 <th className="px-5 py-3 font-medium">Status</th>
@@ -164,6 +169,9 @@ export default function QuoteRequests() {
                   </td>
                   <td className="px-5 py-3 font-medium text-ink">
                     {r.first_name} {r.last_name}
+                  </td>
+                  <td className="px-5 py-3 text-slate">
+                    {r.businesses?.name || '—'}
                   </td>
                   <td className="px-5 py-3 text-slate">
                     <div>{r.email}</div>
@@ -199,6 +207,10 @@ export default function QuoteRequests() {
         <Modal title={`${selected.first_name} ${selected.last_name}`} onClose={() => setSelected(null)}>
           <div className="space-y-4 text-sm">
             <dl className="grid grid-cols-2 gap-x-4 gap-y-2">
+              <div>
+                <dt className="text-xs text-slate uppercase">Business</dt>
+                <dd>{selected.businesses?.name || '—'}</dd>
+              </div>
               <div>
                 <dt className="text-xs text-slate uppercase">Email</dt>
                 <dd>{selected.email}</dd>

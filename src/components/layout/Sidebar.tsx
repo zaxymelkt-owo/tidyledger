@@ -5,29 +5,60 @@ import { navSections, type NavItem } from './navConfig'
 
 function NavSection({ title, items }: { title: string; items: NavItem[] }) {
   return (
-    <div className="mb-5">
-      <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate/80">
-        {title}
-      </p>
-      <div className="space-y-0.5">
-        {items.map(({ to, label, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === '/dashboard'}
-            className={({ isActive }) =>
-              `group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${
-                isActive
-                  ? 'bg-sage-deep text-white shadow-sm shadow-sage-deep/20'
-                  : 'text-slate hover:bg-surface/70 hover:text-ink'
-              }`
-            }
-          >
-            <span className="opacity-90">
-              <Icon />
-            </span>
-            {label}
-          </NavLink>
+    <div className="mb-4">
+      <div className="mb-2 px-2.5">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate/70">{title}</p>
+      </div>
+      <div className="space-y-1">
+        {items.map(({ to, label, icon: Icon, subItems }) => (
+          <div key={to} className="group relative">
+            <NavLink
+              to={to}
+              end={to === '/dashboard'}
+              className={({ isActive }) =>
+                `group flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-150 ${
+                  isActive
+                    ? 'bg-sage-deep text-white shadow-sm shadow-sage-deep/20'
+                    : 'text-slate hover:bg-surface/80 hover:text-ink'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <span
+                    className={`flex h-7 w-7 items-center justify-center rounded-lg border transition-colors ${
+                      isActive
+                        ? 'border-white/20 bg-white/10 text-white'
+                        : 'border-line bg-paper/70 text-slate group-hover:border-sage/30 group-hover:text-sage-deep'
+                    }`}
+                  >
+                    <Icon />
+                  </span>
+                  <span>{label}</span>
+                </>
+              )}
+            </NavLink>
+
+            {subItems && subItems.length > 0 && (
+              <div className="pointer-events-none absolute left-0 top-full z-20 mt-1 hidden min-w-[10rem] rounded-xl border border-line bg-paper-raised p-1 shadow-lg shadow-ink/10 group-hover:block group-hover:pointer-events-auto">
+                {subItems.map((subItem) => (
+                  <NavLink
+                    key={subItem.to}
+                    to={subItem.to}
+                    className={({ isActive }) =>
+                      `block rounded-lg px-3 py-2 text-[12px] font-medium transition-colors ${
+                        isActive
+                          ? 'bg-sage-deep text-white'
+                          : 'text-slate hover:bg-surface/80 hover:text-ink'
+                      }`
+                    }
+                  >
+                    {subItem.label}
+                  </NavLink>
+                ))}
+              </div>
+            )}
+          </div>
         ))}
       </div>
     </div>
@@ -38,7 +69,7 @@ export default function Sidebar() {
   const { session, signOut, business, isPlatformAdmin, isOwnerOrManager } = useAuth()
 
   return (
-    <aside className="w-[15.5rem] shrink-0 border-r border-line/80 bg-gradient-to-b from-paper-raised via-paper-raised to-mist/20 flex flex-col h-dvh sticky top-0">
+    <aside className="w-[16rem] shrink-0 border-r border-line/80 bg-gradient-to-b from-paper-raised via-paper-raised to-mist/20 flex flex-col h-dvh sticky top-0">
       <div className="h-16 flex items-center justify-between px-4 border-b border-line/80">
         <NavLink to="/" className="font-display font-semibold text-[1.05rem] tracking-tight">
           <span className="brand-gradient">TidyLedger</span>
@@ -52,11 +83,14 @@ export default function Sidebar() {
             <NavLink
               to="/platform"
               className={({ isActive }) =>
-                `flex items-center gap-2 px-3 py-2.5 rounded-xl text-[13px] font-semibold transition-colors ${
-                  isActive ? 'bg-brass text-white' : 'bg-brass/15 text-brass-deep hover:bg-brass/25'
+                `flex items-center gap-2 px-3 py-2.5 rounded-xl text-[13px] font-semibold transition-all ${
+                  isActive
+                    ? 'bg-brass text-white shadow-sm shadow-brass/25'
+                    : 'bg-brass/12 text-brass-deep hover:bg-brass/20'
                 }`
               }
             >
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/15">★</span>
               Platform master
             </NavLink>
           </div>
@@ -65,7 +99,7 @@ export default function Sidebar() {
         {isOwnerOrManager && business && !business.commission_accepted_at && business.commission_terms && (
           <NavLink
             to="/commission-terms"
-            className="mb-4 mx-1 flex items-center px-3 py-2 rounded-xl text-[12px] font-medium text-clay bg-clay/10 border border-clay/20"
+            className="mb-4 mx-1 flex items-center px-3 py-2.5 rounded-xl text-[12px] font-medium text-clay bg-clay/10 border border-clay/20"
           >
             Accept commission terms
           </NavLink>
@@ -78,12 +112,12 @@ export default function Sidebar() {
 
       <div className="p-3 border-t border-line/80">
         {session && (
-          <div className="rounded-xl bg-surface/60 border border-line/60 px-3 py-2.5">
+          <div className="rounded-2xl bg-surface/70 border border-line/70 px-3 py-3 shadow-sm shadow-ink/5">
             {business && (
               <p className="text-[11px] font-semibold text-sage-deep truncate">{business.name}</p>
             )}
-            <p className="text-[11px] text-slate truncate">{session.user.email}</p>
-            <div className="flex items-center gap-3 mt-2">
+            <p className="text-[11px] text-slate truncate mt-0.5">{session.user.email}</p>
+            <div className="flex items-center gap-3 mt-2.5">
               <NavLink to="/" className="text-[11px] font-medium text-brass-deep hover:underline">
                 Hub
               </NavLink>

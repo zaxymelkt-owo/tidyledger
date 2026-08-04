@@ -4,25 +4,43 @@ import { useAuth } from '../contexts/AuthContext'
 import { Field, Input } from '../components/ui/Field'
 import Button from '../components/ui/Button'
 import Seo from '../components/Seo'
+import { clearPortalCustomer } from './portal/PortalLogin'
 
 export default function Login() {
-  const { session, signIn, isPlatformAdmin, profile } = useAuth()
+  const { session, signIn, signOut, isPlatformAdmin, profile } = useAuth()
   const [params] = useSearchParams()
   const intent = params.get('intent')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const isStaffIntent = intent === 'employee' || intent === 'owner'
 
-  if (session) return <Navigate to={isPlatformAdmin ? "/platform" : profile?.role === "customer" ? "/portal/dashboard" : "/dashboard"} replace />
+  if (session && !isStaffIntent) {
+    return <Navigate to={isPlatformAdmin ? '/platform' : profile?.role === 'customer' ? '/portal/dashboard' : '/dashboard'} replace />
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (!email.trim() || !password.trim()) {
+      setError('Enter your email and password to continue.')
+      return
+    }
+
     setSubmitting(true)
     setError(null)
-    const { error } = await signIn(email, password)
-    if (error) setError(error)
-    setSubmitting(false)
+
+    try {
+      if (profile?.role === 'customer' && isStaffIntent) {
+        clearPortalCustomer()
+        await signOut()
+      }
+
+      const { error } = await signIn(email.trim(), password)
+      if (error) setError(error)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -58,6 +76,11 @@ export default function Login() {
             {error && (
               <div className="rounded-lg border border-clay/30 bg-clay/5 px-3 py-2 text-sm text-clay">
                 {error}
+              </div>
+            )}
+            {session && profile?.role === 'customer' && isStaffIntent && (
+              <div className="rounded-lg border border-brass/30 bg-brass/5 px-3 py-2 text-sm text-brass">
+                Switching from customer portal to staff sign-in.
               </div>
             )}
 

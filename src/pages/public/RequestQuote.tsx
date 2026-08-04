@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Field, Input, Textarea, Select } from '../../components/ui/Field'
 import Button from '../../components/ui/Button'
@@ -7,6 +7,7 @@ import type { QuoteRequestFormInput } from '../../types'
 import Seo from '../../components/Seo'
 
 const empty: QuoteRequestFormInput = {
+  business_id: null,
   first_name: '',
   last_name: '',
   email: '',
@@ -25,9 +26,24 @@ const empty: QuoteRequestFormInput = {
 
 export default function RequestQuote() {
   const [form, setForm] = useState<QuoteRequestFormInput>(empty)
+  const [businesses, setBusinesses] = useState<Array<{ id: string; name: string }>>([])
   const [submitting, setSubmitting] = useState(false)
   const [done, setDone] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    loadBusinesses()
+  }, [])
+
+  async function loadBusinesses() {
+    const { data, error } = await supabase
+      .from('businesses')
+      .select('id, name')
+      .eq('status', 'active')
+      .order('name')
+
+    if (!error) setBusinesses((data as Array<{ id: string; name: string }> | null) ?? [])
+  }
 
   function update<K extends keyof QuoteRequestFormInput>(key: K, value: QuoteRequestFormInput[K]) {
     setForm((f) => ({ ...f, [key]: value }))
@@ -76,7 +92,8 @@ export default function RequestQuote() {
             <h1 className="font-display text-2xl font-semibold text-ink mb-2">Request received</h1>
             <p className="text-slate mb-6">
               Thanks, {form.first_name}! We will review your details and send a personalized quote to{' '}
-              <strong className="text-ink">{form.email}</strong> shortly.
+              <strong className="text-ink">{form.email}</strong> shortly from{' '}
+              <strong className="text-ink">{businesses.find((b) => b.id === form.business_id)?.name ?? 'your selected business'}</strong>.
             </p>
             <Button onClick={() => { setDone(false); setForm(empty) }}>Submit another request</Button>
           </div>
@@ -86,7 +103,7 @@ export default function RequestQuote() {
               <p className="ticket-number mb-1">ONLINE QUOTE REQUEST</p>
               <h1 className="font-display text-3xl font-semibold text-ink mb-2">Get a free cleaning quote</h1>
               <p className="text-slate">
-                Tell us about your home and preferred service. No account required — we will follow up by email.
+                Choose the business you want quoted, then tell us about your home and preferred service.
               </p>
             </div>
 
@@ -95,6 +112,21 @@ export default function RequestQuote() {
             )}
 
             <form onSubmit={handleSubmit} className="ticket-card p-6 space-y-5">
+              <Field label="Business to quote">
+                <Select
+                  required
+                  value={form.business_id ?? ''}
+                  onChange={(e) => update('business_id', e.target.value || null)}
+                >
+                  <option value="">Select a business…</option>
+                  {businesses.map((business) => (
+                    <option key={business.id} value={business.id}>
+                      {business.name}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Field label="First name">
                   <Input required value={form.first_name} onChange={(e) => update('first_name', e.target.value)} />
@@ -188,7 +220,7 @@ export default function RequestQuote() {
               </Field>
 
               <div className="flex justify-end pt-2">
-                <Button type="submit" disabled={submitting}>
+                <Button type="submit" disabled={submitting || businesses.length === 0}>
                   {submitting ? 'Sending…' : 'Request free quote'}
                 </Button>
               </div>

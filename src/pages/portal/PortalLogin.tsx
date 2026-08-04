@@ -184,8 +184,8 @@ export default function PortalLogin() {
             <Link to="/" className="font-display font-semibold text-lg">
               <span className="brand-gradient">TidyLedger</span>
             </Link>
-            <Link to="/login" className="text-xs text-slate hover:text-ink">
-              Staff
+            <Link to="/" className="text-xs text-slate hover:text-ink">
+              ← Hub
             </Link>
           </div>
         </header>

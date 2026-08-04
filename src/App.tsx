@@ -25,6 +25,8 @@ import MyPay from './pages/MyPay'
 import CommissionTerms from './pages/CommissionTerms'
 import CommissionDisputes from './pages/CommissionDisputes'
 import TaxSettings from './pages/TaxSettings'
+import ThemeSettings from './pages/ThemeSettings'
+import QuoteEstimatorSettings from './pages/QuoteEstimatorSettings'
 import RoleHierarchy from './pages/RoleHierarchy'
 import PlatformDashboard from './pages/platform/PlatformDashboard'
 import PlatformApplications from './pages/platform/PlatformApplications'
@@ -53,9 +55,9 @@ function PlatformOnly({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <BrowserRouter basename="/tidyledger">
-        <AuthProvider>
+    <BrowserRouter basename="/tidyledger">
+      <AuthProvider>
+        <ThemeProvider>
           <Routes>
             <Route path="/" element={<Hub />} />
             <Route path="/request-quote" element={<RequestQuote />} />
@@ -87,6 +89,8 @@ export default function App() {
                         <Route path="/commission-terms" element={<CommissionTerms />} />
                         <Route path="/disputes" element={<CommissionDisputes />} />
                         <Route path="/tax-settings" element={<TaxSettings />} />
+                        <Route path="/theme-settings" element={<ThemeSettings />} />
+                        <Route path="/quote-estimator-settings" element={<QuoteEstimatorSettings />} />
                         <Route path="/roles" element={<RoleHierarchy />} />
                         <Route path="/inventory" element={<Inventory />} />
                         <Route path="/finances" element={<Finances />} />
@@ -133,8 +137,8 @@ export default function App() {
               }
             />
           </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </ThemeProvider>
+        </ThemeProvider>
+      </AuthProvider>
+    </BrowserRouter>
   )
 }

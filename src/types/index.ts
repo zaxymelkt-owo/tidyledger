@@ -148,6 +148,7 @@ export type QuoteRequestStatus = 'new' | 'reviewed' | 'quoted' | 'declined' | 'c
 export type QuoteRequest = {
   id: string
   created_at: string
+  business_id: string | null
   first_name: string
   last_name: string
   email: string
@@ -167,7 +168,10 @@ export type QuoteRequest = {
   converted_quote_id: string | null
 }
 
-export type QuoteRequestFormInput = Omit<QuoteRequest, 'id' | 'created_at' | 'status' | 'admin_notes' | 'converted_quote_id'>
+export type QuoteRequestFormInput = Omit<
+  QuoteRequest,
+  'id' | 'created_at' | 'status' | 'admin_notes' | 'converted_quote_id'
+>
 
 // ── Payments ───────────────────────────────────
 export type PaymentStatus = 'pending' | 'processing' | 'succeeded' | 'failed' | 'refunded'
@@ -291,6 +295,32 @@ export type Business = {
   tax_state_pct?: number | null
   tax_local_pct?: number | null
   tax_notes?: string | null
+  dashboard_theme_mode?: 'light' | 'dark' | null
+  dashboard_color_scheme?: 'forest' | 'violet' | 'terracotta' | null
+  quote_base_rate_standard?: number | null
+  quote_base_rate_deep?: number | null
+  quote_base_rate_move_in_out?: number | null
+  quote_base_rate_post_construction?: number | null
+  quote_base_rate_airbnb?: number | null
+  quote_bedroom_addon?: number | null
+  quote_bathroom_addon?: number | null
+  quote_discount_weekly?: number | null
+  quote_discount_biweekly?: number | null
+  quote_discount_monthly?: number | null
+}
+
+export type QuotePricingAddon = {
+  id: string
+  created_at: string
+  business_id: string
+  label: string
+  price: number
+  description: string | null
+  sort_order: number | null
+  active: boolean
+  is_multiple?: boolean | null
+  quantity_label?: string | null
+  quantity_default?: number | null
 }
 
 export type Profile = {

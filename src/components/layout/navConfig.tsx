@@ -1,6 +1,11 @@
 import type { ReactElement } from 'react'
 
-export type NavItem = { to: string; label: string; icon: () => ReactElement }
+export type NavItem = {
+  to: string
+  label: string
+  icon: () => ReactElement
+  subItems?: NavItem[]
+}
 export type NavSectionConfig = { title: string; items: NavItem[] }
 
 export const navSections: NavSectionConfig[] = [
@@ -39,7 +44,16 @@ export const navSections: NavSectionConfig[] = [
     items: [
       { to: '/reviews', label: 'Reviews', icon: IconStar },
       { to: '/reports', label: 'Reports', icon: IconChart },
-      { to: '/roles', label: 'Roles', icon: IconLayers },
+      {
+        to: '/theme-settings',
+        label: 'Settings',
+        icon: IconPalette,
+        subItems: [
+          { to: '/theme-settings', label: 'Theme', icon: IconPalette },
+          { to: '/roles', label: 'Roles', icon: IconLayers },
+          { to: '/quote-estimator-settings', label: 'Quote pricing', icon: IconDoc },
+        ],
+      },
     ],
   },
 ]
@@ -181,6 +195,16 @@ function IconLayers() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
       <path d="M2 6l6-3 6 3-6 3-6-3zM2 9l6 3 6-3" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+    </svg>
+  )
+}
+function IconPalette() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M8 2.5a5.5 5.5 0 00-5.5 5.5c0 3 2.2 5.2 5 5.2h.5c.8 0 1.5-.7 1.5-1.5v-.5c0-.8.7-1.5 1.5-1.5h1c.8 0 1.5-.7 1.5-1.5A2.5 2.5 0 0011 5c-.7 0-1.4.3-1.9.8A4.5 4.5 0 008 2.5z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
+      <circle cx="5.2" cy="6.2" r=".8" fill="currentColor" />
+      <circle cx="7.8" cy="4.7" r=".8" fill="currentColor" />
+      <circle cx="10.1" cy="6.8" r=".8" fill="currentColor" />
     </svg>
   )
 }

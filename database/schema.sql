@@ -225,6 +225,7 @@ create unique index if not exists customers_portal_code_idx
 create table if not exists quote_requests (
   id                uuid primary key default gen_random_uuid(),
   created_at        timestamptz not null default now(),
+  business_id       uuid references businesses(id) on delete set null,
   first_name        text not null,
   last_name         text not null,
   email             text not null,

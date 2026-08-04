@@ -1,5 +1,5 @@
 import type { InventoryCategory, InventoryFormInput, InventoryItem } from '../types'
-import { downloadCsv, parseCsv } from './csv'
+import { downloadCsv } from './csv'
 
 const CATEGORIES: InventoryCategory[] = ['supplies', 'equipment', 'consumables', 'ppe', 'other']
 

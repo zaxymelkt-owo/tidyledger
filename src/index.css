@@ -15,19 +15,19 @@
   --font-body: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
-  --color-paper: #E4EFE9;
-  --color-paper-raised: #F3F9F6;
-  --color-surface: #FFFFFF;
-  --color-ink: #0F1F1A;
-  --color-slate: #4A635A;
-  --color-sage: #5F9B82;
-  --color-sage-deep: #1E4D3E;
-  --color-mist: #A8CFBC;
-  --color-brass: #7B68A6;
-  --color-brass-deep: #5A4A82;
-  --color-lilac: #C4B3E0;
-  --color-clay: #B8433F;
-  --color-line: #B9D0C4;
+  --color-paper: #DCE9E2;
+  --color-paper-raised: #EAF3EE;
+  --color-surface: #F7FBF8;
+  --color-ink: #16241E;
+  --color-slate: #536B61;
+  --color-sage: #6FA58B;
+  --color-sage-deep: #285B49;
+  --color-mist: #B6D5C5;
+  --color-brass: #8B7BB5;
+  --color-brass-deep: #675693;
+  --color-lilac: #CFC3E8;
+  --color-clay: #C05A55;
+  --color-line: #C4D8CC;
 }
 
 /* Ambient gradient stops — raw CSS only (not Tailwind utilities). */
@@ -63,37 +63,47 @@
 }
 
 :root[data-color-scheme='violet'] {
-  --color-brass: #7B68A6;
-  --color-brass-deep: #5A4A82;
-  --color-lilac: #C4B3E0;
-  --grad-brass-glow: rgba(123, 104, 166, 0.24);
+  --color-brass: #8B7BB5;
+  --color-brass-deep: #675693;
+  --color-lilac: #CFC3E8;
+
+  --grad-brass-glow: rgba(139, 123, 181, 0.16);
 }
 
 :root[data-color-scheme='terracotta'] {
-  --color-sage: #6C8F72;
-  --color-sage-deep: #49634C;
-  --color-brass: #B36643;
-  --color-brass-deep: #7F422A;
-  --color-lilac: #E6C2A6;
-  --grad-brass-glow: rgba(179, 102, 67, 0.24);
-  --grad-sage-glow: rgba(73, 99, 76, 0.22);
+  --color-sage: #789982;
+  --color-sage-deep: #536B59;
+
+  --color-brass: #B97858;
+  --color-brass-deep: #8D5238;
+
+  --color-lilac: #E1C3AE;
+
+  --grad-brass-glow: rgba(185, 120, 88, 0.16);
+  --grad-sage-glow: rgba(83, 107, 89, 0.16);
 }
+
 
 .dark[data-color-scheme='violet'] {
   --color-brass: #A48EE0;
   --color-brass-deep: #8A76CC;
   --color-lilac: #D9CBF2;
+
   --grad-brass-glow: rgba(164, 142, 224, 0.16);
 }
+
 
 .dark[data-color-scheme='terracotta'] {
   --color-sage: #8AB18D;
   --color-sage-deep: #5B785F;
+
   --color-brass: #D18E65;
   --color-brass-deep: #A76446;
+
   --color-lilac: #E9D0B9;
+
   --grad-brass-glow: rgba(209, 142, 101, 0.18);
-  --grad-sage-glow: rgba(91, 120, 95, 0.2);
+  --grad-sage-glow: rgba(91, 120, 95, 0.20);
 }
 
 html {

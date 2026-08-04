@@ -230,3 +230,10 @@ Business owners see **Accept commission terms** until accepted. Payroll lives un
 ## Security
 
 See [`docs/SECURITY.md`](./docs/SECURITY.md) for auth, platform admins, sensitive fields, and rate limits.
+
+
+## Mobile & reminders
+
+- Calendar export (.ics) and per-job Google Calendar links on **Jobs**
+- SMS reminders: `database/017_job_reminders.sql` + `supabase/functions/send-job-reminders` (Twilio)
+- Native shell notes: [`docs/MOBILE.md`](./docs/MOBILE.md)

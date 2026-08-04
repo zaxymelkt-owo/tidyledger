@@ -6,6 +6,7 @@ import Button from '../components/ui/Button'
 import Modal from '../components/ui/Modal'
 import JobForm from '../components/JobForm'
 import { supabase } from '../lib/supabase'
+import { downloadJobsIcs, googleCalendarUrl } from '../lib/calendar'
 import type { Customer, JobFormInput, JobStatus, JobWithCustomer } from '../types'
 
 type ModalState = { mode: 'add' } | { mode: 'edit'; job: JobWithCustomer } | null
@@ -94,6 +95,17 @@ export default function Jobs() {
     }
   }
 
+  async function queueSmsReminder(job: JobWithCustomer) {
+    const { error } = await supabase.rpc('queue_job_sms_reminder', { p_job_id: job.id })
+    if (error) {
+      setError(error.message)
+      return
+    }
+    setError(null)
+    alert('SMS reminder queued for the day before this job (requires Twilio + send-job-reminders function).')
+    await loadAll()
+  }
+
   async function handleDelete(job: JobWithCustomer) {
     if (!confirm('Delete this job? This can\'t be undone.')) return
     const { error } = await supabase.from('jobs').delete().eq('id', job.id)
@@ -132,6 +144,31 @@ export default function Jobs() {
               </button>
             ))}
           </div>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => {
+              const rows = filtered.length ? filtered : jobs
+              downloadJobsIcs(
+                rows.map((j) => ({
+                  id: j.id,
+                  job_date: j.job_date,
+                  service: j.service,
+                  notes: j.notes,
+                  status: j.status,
+                  customerName: j.customers
+                    ? `${j.customers.first_name} ${j.customers.last_name}`
+                    : null,
+                  address: j.customers?.address ?? null,
+                  city: j.customers?.city ?? null,
+                })),
+                `tidyledger-jobs-${new Date().toISOString().slice(0, 10)}.ics`,
+              )
+            }}
+            disabled={jobs.length === 0}
+          >
+            Export calendar
+          </Button>
           <Button onClick={() => setModal({ mode: 'add' })}>+ Add job</Button>
         </div>
 
@@ -202,6 +239,32 @@ export default function Jobs() {
                     >
                       Field
                     </Link>
+                    <a
+                      href={googleCalendarUrl({
+                        id: j.id,
+                        job_date: j.job_date,
+                        service: j.service,
+                        notes: j.notes,
+                        customerName: j.customers
+                          ? `${j.customers.first_name} ${j.customers.last_name}`
+                          : null,
+                        address: j.customers?.address ?? null,
+                        city: j.customers?.city ?? null,
+                      })}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs font-medium text-sage-deep hover:underline mr-3"
+                    >
+                      Calendar
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => queueSmsReminder(j)}
+                      className="text-xs font-medium text-sage-deep hover:underline mr-3"
+                      title="Queue day-before SMS to customer phone"
+                    >
+                      SMS
+                    </button>
                     <button
                       onClick={() => setModal({ mode: 'edit', job: j })}
                       className="text-xs font-medium text-sage-deep hover:underline mr-3"

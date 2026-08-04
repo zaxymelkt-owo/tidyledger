@@ -15,6 +15,7 @@ const emptyForm: CustomerFormInput = {
   gate_code: '',
   alarm_code: '',
   pets: '',
+  sms_opt_in: false,
   preferred_cleaner: '',
   cleaning_frequency: 'biweekly',
   square_footage: null,
@@ -41,6 +42,7 @@ export default function CustomerForm({
           first_name: initial.first_name,
           last_name: initial.last_name,
           phone: initial.phone,
+          sms_opt_in: Boolean(initial.sms_opt_in),
           email: initial.email,
           address: initial.address,
           city: initial.city,
@@ -90,6 +92,18 @@ export default function CustomerForm({
         <Field label="Phone">
           <Input value={form.phone ?? ''} onChange={(e) => update('phone', e.target.value)} />
         </Field>
+        <label className="col-span-2 flex items-start gap-2 text-sm text-slate mt-1">
+          <input
+            type="checkbox"
+            className="mt-1"
+            checked={Boolean(form.sms_opt_in)}
+            onChange={(e) => update('sms_opt_in', e.target.checked)}
+          />
+          <span>
+            SMS job reminders OK
+            <span className="block text-xs text-slate/80">Customer consents to day-before job texts. Required for legal SMS sends.</span>
+          </span>
+        </label>
         <Field label="Email">
           <Input
             type="email"

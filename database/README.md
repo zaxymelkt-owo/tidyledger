@@ -69,3 +69,5 @@ select proname from pg_proc where proname like 'portal_%';
 | 15 | `015_rate_limits_and_access_audit.sql` | Rate limits, sensitive access audit, grant_platform_admin |
 
 | 16 | `016_reviews_business_id.sql` | Reviews scoped to business_id + tenant RLS |
+
+| 17 | `017_job_reminders.sql` | SMS reminder queue, customers.sms_opt_in |

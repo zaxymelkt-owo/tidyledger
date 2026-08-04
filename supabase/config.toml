@@ -1,8 +1,24 @@
-# Minimal Supabase config for Edge Functions
-# https://supabase.com/docs/guides/cli
+# Supabase local / linked project config (Edge Functions)
+# https://supabase.com/docs/guides/cli/config
+
+[api]
+enabled = true
 
 [functions.create-checkout-session]
+# Public pay link — no user JWT required
 verify_jwt = false
 
 [functions.stripe-webhook]
+# Stripe signs the body; do not require Supabase JWT
+verify_jwt = false
+
+[functions.send-email]
+# Called from the browser with the anon key + user session when available
+verify_jwt = false
+
+[functions.send-job-reminders]
+# Invoked by cron; protect with CRON_SECRET header in production
+verify_jwt = false
+
+[functions.health]
 verify_jwt = false

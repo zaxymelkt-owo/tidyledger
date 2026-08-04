@@ -1,40 +1,31 @@
-// Supabase Edge Function: create-checkout-session
+// Create a Stripe Checkout session for a payment access_token.
 // Deploy: supabase functions deploy create-checkout-session --no-verify-jwt
-// Secrets: STRIPE_SECRET_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
-// Optional: SITE_URL (e.g. https://youruser.github.io/tidyledger)
+// Secrets: STRIPE_SECRET_KEY
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1'
 import Stripe from 'https://esm.sh/stripe@17.7.0?target=deno'
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+import { handleCors, json } from '../_shared/cors.ts'
+import { serviceClient, siteUrl } from '../_shared/supabase.ts'
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
+  const cors = handleCors(req)
+  if (cors) return cors
 
   try {
+    if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405)
+
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY')
-    if (!stripeKey) {
-      return json({ error: 'STRIPE_SECRET_KEY is not configured' }, 500)
-    }
+    if (!stripeKey) return json({ error: 'STRIPE_SECRET_KEY is not configured' }, 500)
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? Deno.env.get('SB_URL') ?? ''
-    const serviceKey =
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? Deno.env.get('SB_SERVICE_ROLE_KEY') ?? ''
-    if (!supabaseUrl || !serviceKey) {
-      return json({ error: 'Supabase service credentials are not configured' }, 500)
-    }
+    const body = await req.json()
+    const access_token = body?.access_token
+    const success_url = body?.success_url
+    const cancel_url = body?.cancel_url
 
-    const { access_token, success_url, cancel_url } = await req.json()
     if (!access_token || typeof access_token !== 'string') {
       return json({ error: 'access_token is required' }, 400)
     }
 
-    const supabase = createClient(supabaseUrl, serviceKey)
+    const supabase = serviceClient()
     const stripe = new Stripe(stripeKey, {
       apiVersion: '2024-12-18.acacia',
       httpClient: Stripe.createFetchHttpClient(),
@@ -60,15 +51,13 @@ Deno.serve(async (req) => {
       return json({ error: 'Amount must be at least $0.50' }, 400)
     }
 
-    const siteUrl =
-      Deno.env.get('SITE_URL')?.replace(/\/$/, '') ||
-      (typeof success_url === 'string' ? new URL(success_url).origin : '')
-
+    const base = siteUrl()
     const defaultSuccess =
-      success_url ||
-      `${siteUrl}/pay/${access_token}?status=success&session_id={CHECKOUT_SESSION_ID}`
+      (typeof success_url === 'string' && success_url) ||
+      `${base}/pay/${access_token}?status=success&session_id={CHECKOUT_SESSION_ID}`
     const defaultCancel =
-      cancel_url || `${siteUrl}/pay/${access_token}?status=cancelled`
+      (typeof cancel_url === 'string' && cancel_url) ||
+      `${base}/pay/${access_token}?status=cancelled`
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
@@ -95,6 +84,7 @@ Deno.serve(async (req) => {
         access_token: payment.access_token,
         job_id: payment.job_id || '',
         customer_id: payment.customer_id || '',
+        business_id: payment.business_id || '',
       },
       success_url: defaultSuccess,
       cancel_url: defaultCancel,
@@ -118,14 +108,7 @@ Deno.serve(async (req) => {
     return json({ url: session.url, session_id: session.id })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unexpected error'
-    console.error(message)
+    console.error('create-checkout-session', message)
     return json({ error: message }, 500)
   }
 })
-
-function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-  })
-}

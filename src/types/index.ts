@@ -22,6 +22,7 @@ export type Customer = {
   business_id: string | null
   auth_user_id: string | null
   account_claimed_at: string | null
+  sms_opt_in?: boolean
 }
 
 export type CustomerFormInput = Omit<
@@ -43,6 +44,8 @@ export type Job = {
   payment_status: JobPaymentStatus
   assigned_employee: string | null
   notes: string | null
+  remind_sms?: boolean
+  reminded_at?: string | null
 }
 
 export type JobFormInput = Omit<Job, 'id' | 'created_at'>

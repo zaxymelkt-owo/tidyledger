@@ -32,11 +32,12 @@
 
 /* Ambient gradient stops — raw CSS only (not Tailwind utilities). */
 :root {
-  --grad-brass-glow: rgba(123, 104, 166, 0.22);
-  --grad-sage-glow: rgba(30, 77, 62, 0.2);
-  --grad-mist-glow: rgba(168, 207, 188, 0.35);
-  --grad-base-top: #dcebe3;
-  --grad-base-bottom: #e8f2ec;
+  --grad-brass-glow: rgba(139, 123, 181, 0.14);
+  --grad-sage-glow: rgba(111, 165, 139, 0.14);
+  --grad-mist-glow: rgba(182, 213, 197, 0.55);
+
+  --grad-base-top: #EAF3EE;
+  --grad-base-bottom: #DCE9E2;
 }
 
 /* Dark canvas — toggled via `.dark` on <html> (ThemeContext). */

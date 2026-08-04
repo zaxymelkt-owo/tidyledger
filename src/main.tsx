@@ -4,8 +4,10 @@ import './index.css'
 import App from './App.tsx'
 import { registerServiceWorker } from './lib/registerSW'
 import { syncOfflineQueue } from './lib/syncOfflineQueue'
+import { installGlobalErrorHandlers } from './lib/monitoring'
 
 registerServiceWorker()
+installGlobalErrorHandlers()
 
 // Sync offline field actions when connectivity returns
 window.addEventListener('online', () => {

@@ -1,5 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+/* Tailwind v4: must be first so @tailwindcss/vite emits utilities.
+   External font @import before this can prevent the pipeline from running. */
 @import "tailwindcss";
+
+/* Ensure class names in source files are scanned */
+@source "./**/*.{js,ts,jsx,tsx}";
+@source "../index.html";
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
 
 /* Nordic Ghostly Green — pronounced mist, forest, purple */
 @theme {
@@ -22,9 +30,7 @@
   --color-line: #B9D0C4;
 }
 
-/* Ambient gradient stops used behind the app shell. Kept separate from the
-   @theme color tokens above since they're only ever consumed as raw CSS,
-   never as Tailwind utilities. */
+/* Ambient gradient stops — raw CSS only (not Tailwind utilities). */
 :root {
   --grad-brass-glow: rgba(123, 104, 166, 0.22);
   --grad-sage-glow: rgba(30, 77, 62, 0.2);
@@ -33,10 +39,7 @@
   --grad-base-bottom: #e8f2ec;
 }
 
-/* Ghostly Green — Night. Same family, re-tuned for a dark canvas: deeper
-   forest paper, brighter sage/brass so accents still pop, softened lilac
-   and clay so nothing turns neon at low luminance. Toggled by adding
-   `.dark` to <html> — see src/contexts/ThemeContext.tsx. */
+/* Dark canvas — toggled via `.dark` on <html> (ThemeContext). */
 .dark {
   --color-paper: #0B1512;
   --color-paper-raised: #132119;
@@ -121,6 +124,7 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Work-order ticket motif for content cards */
 .ticket-card {
   position: relative;
   background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-paper-raised) 100%);
@@ -156,6 +160,16 @@ body {
   box-shadow: 0 0 0 1px var(--color-line);
 }
 
+/* Plain surface for menus / dropdowns (no ticket perforation) */
+.menu-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  box-shadow:
+    0 1px 0 rgba(123, 104, 166, 0.08),
+    0 12px 32px -12px rgba(15, 31, 26, 0.2);
+}
+
 .ticket-number {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -187,7 +201,6 @@ body {
   outline-offset: 2px;
 }
 
-/* Brand gradient text */
 .brand-gradient {
   background: linear-gradient(120deg, var(--color-sage-deep) 0%, var(--color-brass) 100%);
   -webkit-background-clip: text;
@@ -195,7 +208,6 @@ body {
   color: transparent;
 }
 
-/* Purple accent chip */
 .chip-purple {
   background: color-mix(in srgb, var(--color-brass) 14%, var(--color-surface));
   color: var(--color-brass-deep);

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Field, Input, Textarea, Select } from '../../components/ui/Field'
 import Button from '../../components/ui/Button'
 import { supabase } from '../../lib/supabase'
+import { allowAction, rateLimitMessage } from '../../lib/rateLimit'
 import type { QuoteRequestFormInput } from '../../types'
 import Seo from '../../components/Seo'
 
@@ -51,6 +52,23 @@ export default function RequestQuote() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    const key = `quote:${(form.email || '').toLowerCase()}`
+    if (!allowAction(key, 5, 60 * 60 * 1000)) {
+      setError(rateLimitMessage(3600))
+      return
+    }
+    // Server-side helper when 015 is applied
+    try {
+      const { data: allowed } = await supabase.rpc('check_rate_limit', {
+        p_bucket: key,
+        p_max: 5,
+        p_window_seconds: 3600,
+      })
+      if (allowed === false) {
+        setError(rateLimitMessage(3600))
+        return
+      }
+    } catch { /* optional until migration runs */ }
     setSubmitting(true)
     setError(null)
     try {
@@ -62,6 +80,24 @@ export default function RequestQuote() {
         bathrooms: form.bathrooms || null,
       })
       if (error) throw error
+
+      // Best-effort staff notification (Edge Function + Resend)
+      if (form.business_id) {
+        const { data: biz } = await supabase
+          .from('businesses')
+          .select('email, name')
+          .eq('id', form.business_id)
+          .maybeSingle()
+        if (biz?.email) {
+          const { notifyEmail } = await import('../../lib/notify')
+          void notifyEmail('quote_request_received', biz.email, {
+            name: `${form.first_name} ${form.last_name}`,
+            email: form.email,
+            service: form.service_type,
+            business: biz.name,
+          })
+        }
+      }
       setDone(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not submit request.')

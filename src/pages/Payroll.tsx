@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { format, subDays } from 'date-fns'
 import Topbar from '../components/layout/Topbar'
 import Button from '../components/ui/Button'
+import { downloadCsv } from '../lib/csv'
 import Modal from '../components/ui/Modal'
 import { Field, Input, Select } from '../components/ui/Field'
 import { supabase } from '../lib/supabase'
@@ -125,6 +126,43 @@ export default function Payroll() {
             <Button onClick={() => setTimeOpen(true)}>+ Time entry</Button>
             <Button variant="secondary" onClick={buildRun} disabled={busy}>
               {busy ? 'Building…' : 'Build payroll run'}
+            </Button>
+            <Button
+              variant="secondary"
+              type="button"
+              onClick={() =>
+                downloadCsv(
+                  `payroll-time-${periodStart}_${periodEnd}.csv`,
+                  entries.map((e) => ({
+                    employee: empName(e.employee_id),
+                    work_date: e.work_date,
+                    hours: e.hours,
+                    notes: e.notes,
+                  }))
+                )
+              }
+              disabled={entries.length === 0}
+            >
+              Export time CSV
+            </Button>
+            <Button
+              variant="secondary"
+              type="button"
+              onClick={() =>
+                downloadCsv(
+                  `payroll-lines-${selectedRun ?? 'run'}.csv`,
+                  lines.map((l) => ({
+                    employee: empName(l.employee_id),
+                    hours: l.hours,
+                    hourly_rate: l.hourly_rate,
+                    gross_pay: l.gross_pay,
+                    notes: l.notes,
+                  }))
+                )
+              }
+              disabled={!selectedRun || lines.length === 0}
+            >
+              Export run CSV
             </Button>
             <div className="flex gap-2 items-center text-sm">
               <Input type="date" value={periodStart} onChange={(e) => setPeriodStart(e.target.value)} />

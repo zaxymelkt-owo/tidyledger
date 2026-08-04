@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Field, Input, Textarea, Select } from './ui/Field'
 import Button from './ui/Button'
+import { supabase } from '../lib/supabase'
 import type { Customer, CustomerFormInput } from '../types'
 
 const emptyForm: CustomerFormInput = {
@@ -33,6 +34,7 @@ export default function CustomerForm({
   onCancel: () => void
   submitting: boolean
 }) {
+  const [revealCodes, setRevealCodes] = useState(!initial)
   const [form, setForm] = useState<CustomerFormInput>(
     initial
       ? {
@@ -110,13 +112,54 @@ export default function CustomerForm({
         </Field>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="Gate code">
-          <Input value={form.gate_code ?? ''} onChange={(e) => update('gate_code', e.target.value)} />
-        </Field>
-        <Field label="Alarm code">
-          <Input value={form.alarm_code ?? ''} onChange={(e) => update('alarm_code', e.target.value)} />
-        </Field>
+      <div className="rounded-xl border border-clay/25 bg-clay/5 p-4 space-y-3">
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <p className="text-sm font-semibold text-ink">Access codes (staff only)</p>
+            <p className="text-xs text-slate mt-0.5 leading-relaxed">
+              Gate and alarm codes never appear in the customer portal. Reveal only when needed on site;
+              access can be audited.
+            </p>
+          </div>
+          {initial && !revealCodes && (
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={async () => {
+                setRevealCodes(true)
+                if (initial.id) {
+                  await supabase.rpc('log_sensitive_customer_access', {
+                    p_customer_id: initial.id,
+                    p_action: 'view_codes',
+                    p_meta: { source: 'CustomerForm' },
+                  })
+                }
+              }}
+            >
+              Reveal codes
+            </Button>
+          )}
+        </div>
+        {revealCodes ? (
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Gate code">
+              <Input
+                value={form.gate_code ?? ''}
+                onChange={(e) => update('gate_code', e.target.value)}
+                autoComplete="off"
+              />
+            </Field>
+            <Field label="Alarm code">
+              <Input
+                value={form.alarm_code ?? ''}
+                onChange={(e) => update('alarm_code', e.target.value)}
+                autoComplete="off"
+              />
+            </Field>
+          </div>
+        ) : (
+          <p className="text-xs text-slate font-mono">••••  ·  ••••</p>
+        )}
       </div>
 
       <div className="grid grid-cols-3 gap-4">

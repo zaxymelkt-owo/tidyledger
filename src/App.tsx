@@ -17,6 +17,8 @@ import Inventory from './pages/Inventory'
 import Finances from './pages/Finances'
 import Reports from './pages/Reports'
 import QuoteRequests from './pages/QuoteRequests'
+import Messages from './pages/Messages'
+import DataExport from './pages/DataExport'
 import Payments from './pages/Payments'
 import Reviews from './pages/Reviews'
 import Team from './pages/Team'
@@ -63,10 +65,10 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Hub />} />
             <Route path="/request-quote" element={<RequestQuote />} />
-            <Route path="/pay/:token" element={<PayOnline />} />
-            <Route path="/review/:token" element={<LeaveReview />} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/pay/:token" element={<PayOnline />} />
+            <Route path="/review/:token" element={<LeaveReview />} />
             <Route path="/portal" element={<PortalLogin />} />
             <Route path="/portal/dashboard" element={<PortalDashboard />} />
             <Route path="/login" element={<Login />} />
@@ -86,6 +88,7 @@ export default function App() {
                         <Route path="/jobs/:jobId/field" element={<JobField />} />
                         <Route path="/quotes" element={<Quotes />} />
                         <Route path="/quote-requests" element={<QuoteRequests />} />
+                        <Route path="/messages" element={<Messages />} />
                         <Route path="/employees" element={<Employees />} />
                         <Route path="/team" element={<Team />} />
                         <Route path="/payroll" element={<Payroll />} />
@@ -101,6 +104,7 @@ export default function App() {
                         <Route path="/payments" element={<Payments />} />
                         <Route path="/reviews" element={<Reviews />} />
                         <Route path="/reports" element={<Reports />} />
+                        <Route path="/data-export" element={<DataExport />} />
 
                         <Route
                           path="/platform"

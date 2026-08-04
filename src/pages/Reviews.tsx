@@ -6,6 +6,7 @@ import Modal from '../components/ui/Modal'
 import StatCard from '../components/ui/StatCard'
 import { Field, Textarea } from '../components/ui/Field'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../contexts/AuthContext'
 import type { Review, ReviewStatus } from '../types'
 
 const statusStyles: Record<ReviewStatus, string> = {
@@ -15,6 +16,7 @@ const statusStyles: Record<ReviewStatus, string> = {
 }
 
 export default function Reviews() {
+  const { business } = useAuth()
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -26,17 +28,16 @@ export default function Reviews() {
 
   useEffect(() => {
     load()
-  }, [])
+  }, [business?.id])
 
   async function load() {
     setLoading(true)
     setError(null)
-    const { data, error } = await supabase
-      .from('reviews')
-      .select('*')
-      .order('created_at', { ascending: false })
+    let q = supabase.from('reviews').select('*').order('created_at', { ascending: false })
+    if (business?.id) q = q.eq('business_id', business.id)
+    const { data, error } = await q
     if (error) setError(error.message)
-    else setReviews(data ?? [])
+    else setReviews((data as Review[]) ?? [])
     setLoading(false)
   }
 
@@ -96,7 +97,8 @@ export default function Reviews() {
 
   function copyPublicReviewLink() {
     const base = window.location.origin + (import.meta.env.BASE_URL || '/').replace(/\/$/, '')
-    navigator.clipboard.writeText(`${base}/review/new`)
+    const qs = business?.id ? `?business=${business.id}` : ''
+    navigator.clipboard.writeText(`${base}/review/new${qs}`)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }

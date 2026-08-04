@@ -16,7 +16,8 @@ export const navSections: NavSectionConfig[] = [
       { to: '/jobs', label: 'Jobs', icon: IconCalendar },
       { to: '/customers', label: 'Customers', icon: IconUsers },
       { to: '/quotes', label: 'Quotes', icon: IconDoc },
-      { to: '/quote-requests', label: 'Inbox', icon: IconInbox },
+      { to: '/quote-requests', label: 'Quote requests', icon: IconInbox },
+      { to: '/messages', label: 'Messages', icon: IconInbox },
     ],
   },
   {
@@ -44,6 +45,7 @@ export const navSections: NavSectionConfig[] = [
     items: [
       { to: '/reviews', label: 'Reviews', icon: IconStar },
       { to: '/reports', label: 'Reports', icon: IconChart },
+      { to: '/data-export', label: 'Data export', icon: IconDoc },
       {
         to: '/theme-settings',
         label: 'Settings',

@@ -6,6 +6,8 @@ import Modal from '../components/ui/Modal'
 import StatCard from '../components/ui/StatCard'
 import { Field, Input, Select, Textarea } from '../components/ui/Field'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../contexts/AuthContext'
+import { openInvoicePrintWindow } from '../lib/invoicePdf'
 import type { Customer, Job, Payment, PaymentFormInput, PaymentStatus } from '../types'
 
 type ModalState = { mode: 'add' } | { mode: 'edit'; payment: Payment } | null
@@ -34,6 +36,7 @@ function emptyForm(): PaymentFormInput {
 }
 
 export default function Payments() {
+  const { business } = useAuth()
   const [payments, setPayments] = useState<Payment[]>([])
   const [customers, setCustomers] = useState<Customer[]>([])
   const [jobs, setJobs] = useState<Job[]>([])
@@ -244,6 +247,27 @@ export default function Payments() {
                         {copiedId === p.id ? 'Copied!' : 'Copy link'}
                       </button>
                     )}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        openInvoicePrintWindow({
+                          businessName: business?.name ?? 'TidyLedger business',
+                          businessEmail: business?.email ?? null,
+                          invoiceNumber: `INV-${p.id.slice(0, 8).toUpperCase()}`,
+                          issuedAt: format(new Date(p.created_at), 'MMM d, yyyy'),
+                          customerName: p.payer_name || 'Customer',
+                          customerEmail: p.payer_email,
+                          description: p.description || 'Service payment',
+                          amount: p.amount,
+                          status: p.status,
+                          reference: p.reference || p.stripe_checkout_session_id,
+                          paidAt: p.paid_at ? format(new Date(p.paid_at), 'MMM d, yyyy') : null,
+                        })
+                      }
+                      className="text-xs font-medium text-sage-deep hover:underline mr-3"
+                    >
+                      Invoice
+                    </button>
                     <button onClick={() => openEdit(p)} className="text-xs font-medium text-sage-deep hover:underline mr-3">
                       Edit
                     </button>

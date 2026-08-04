@@ -212,6 +212,7 @@ export type ReviewStatus = 'pending' | 'published' | 'hidden'
 export type Review = {
   id: string
   created_at: string
+  business_id: string | null
   customer_id: string | null
   job_id: string | null
   customer_name: string
@@ -225,6 +226,7 @@ export type Review = {
 }
 
 export type ReviewFormInput = {
+  business_id: string
   customer_id?: string | null
   job_id?: string | null
   customer_name: string

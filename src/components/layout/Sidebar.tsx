@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { navVisibleForRole } from '../../lib/permissions'
 import ThemeToggle from '../ui/ThemeToggle'
 import { navSections, type NavItem } from './navConfig'
 
@@ -66,7 +67,19 @@ function NavSection({ title, items }: { title: string; items: NavItem[] }) {
 }
 
 export default function Sidebar() {
-  const { session, signOut, business, isPlatformAdmin, isOwnerOrManager } = useAuth()
+  const { session, signOut, business, isPlatformAdmin, isOwnerOrManager, role } = useAuth()
+
+  const visibleSections = navSections
+    .map((section) => ({
+      ...section,
+      items: section.items
+        .map((item) => ({
+          ...item,
+          subItems: item.subItems?.filter((sub) => navVisibleForRole(role, sub.to)),
+        }))
+        .filter((item) => navVisibleForRole(role, item.to)),
+    }))
+    .filter((section) => section.items.length > 0)
 
   return (
     <aside className="w-[16rem] shrink-0 border-r border-line/80 bg-gradient-to-b from-paper-raised via-paper-raised to-mist/20 flex flex-col h-dvh sticky top-0">
@@ -105,7 +118,7 @@ export default function Sidebar() {
           </NavLink>
         )}
 
-        {navSections.map((section) => (
+        {visibleSections.map((section) => (
           <NavSection key={section.title} title={section.title} items={section.items} />
         ))}
       </nav>

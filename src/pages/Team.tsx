@@ -75,6 +75,12 @@ export default function Team() {
     }
     const inv = data as StaffInvite
     const link = `${window.location.origin}${import.meta.env.BASE_URL}invite/${inv.token}`
+    const { notifyEmail } = await import('../lib/notify')
+    void notifyEmail('staff_invite', inv.email, {
+      business_name: business?.name,
+      invite_url: link,
+      role: inv.role,
+    })
     setLastLink(link)
     setOpen(false)
     setEmail('')

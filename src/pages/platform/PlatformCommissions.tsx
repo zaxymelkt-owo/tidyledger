@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { format, startOfMonth, endOfMonth } from 'date-fns'
 import Topbar from '../../components/layout/Topbar'
 import Button from '../../components/ui/Button'
+import { downloadCsv } from '../../lib/csv'
 import { Field, Input, Select } from '../../components/ui/Field'
 import { supabase } from '../../lib/supabase'
 import type { Business, CommissionEntry } from '../../types'
@@ -76,9 +77,33 @@ export default function PlatformCommissions() {
           <Field label="Period end">
             <Input type="date" value={end} onChange={(e) => setEnd(e.target.value)} />
           </Field>
-          <Button onClick={generate} disabled={busy || !bizId}>
-            {busy ? 'Calculating…' : 'Generate entry'}
-          </Button>
+          <div className="flex flex-col gap-2">
+            <Button onClick={generate} disabled={busy || !bizId}>
+              {busy ? 'Calculating…' : 'Generate entry'}
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={entries.length === 0}
+              onClick={() =>
+                downloadCsv(
+                  'platform-commissions.csv',
+                  entries.map((e) => ({
+                    business: e.businesses?.name ?? e.business_id,
+                    period_start: e.period_start,
+                    period_end: e.period_end,
+                    gross_revenue: e.gross_revenue,
+                    rate_pct: e.rate_pct,
+                    commission_due: e.commission_due,
+                    status: e.status,
+                    paid_at: e.paid_at,
+                  }))
+                )
+              }
+            >
+              Export CSV
+            </Button>
+          </div>
         </div>
 
         <div className="ticket-card overflow-hidden">

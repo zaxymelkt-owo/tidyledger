@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { Field, Input } from '../../components/ui/Field'
 import Button from '../../components/ui/Button'
 import { supabase } from '../../lib/supabase'
+import { allowAction, rateLimitMessage } from '../../lib/rateLimit'
 import Seo from '../../components/Seo'
 import { useAuth } from '../../contexts/AuthContext'
 
@@ -75,9 +76,23 @@ export default function PortalLogin() {
 
   async function handleCodeLogin(e: React.FormEvent) {
     e.preventDefault()
+    const bucket = `portal:${email.trim().toLowerCase() || 'unknown'}`
+    if (!allowAction(bucket, 8, 15 * 60 * 1000)) {
+      setError(rateLimitMessage(15 * 60))
+      return
+    }
     setLoading(true)
     setError(null)
     setInfo(null)
+    try {
+      await supabase.rpc('check_rate_limit', {
+        p_bucket: bucket,
+        p_max: 8,
+        p_window_seconds: 900,
+      })
+    } catch {
+      /* optional until 015 applied */
+    }
     try {
       const { data, error } = await supabase
         .rpc('portal_login', { p_email: email.trim(), p_portal_code: code.trim() })

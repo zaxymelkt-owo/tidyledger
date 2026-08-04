@@ -18,6 +18,10 @@ export default function PortalDashboard() {
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [message, setMessage] = useState('')
+  const [messageBusy, setMessageBusy] = useState(false)
+  const [messageSent, setMessageSent] = useState(false)
+  const [quoteBusyId, setQuoteBusyId] = useState<string | null>(null)
 
   useEffect(() => {
     if (!customer) {
@@ -102,6 +106,42 @@ export default function PortalDashboard() {
     clearPortalCustomer()
     await authSignOut()
     navigate('/portal')
+  }
+
+  async function updateQuoteStatus(quoteId: string, status: 'accepted' | 'declined') {
+    if (!customer) return
+    setQuoteBusyId(quoteId)
+    setError(null)
+    const { data, error } = await supabase.rpc('portal_update_quote_status', {
+      p_email: customer.email,
+      p_portal_code: customer.portal_code,
+      p_quote_id: quoteId,
+      p_status: status,
+    })
+    if (error) setError(error.message)
+    else if (data) {
+      const updated = data as Quote
+      setQuotes((list) => list.map((q) => (q.id === quoteId ? { ...q, status: updated.status } : q)))
+    }
+    setQuoteBusyId(null)
+  }
+
+  async function sendMessage(e: React.FormEvent) {
+    e.preventDefault()
+    if (!customer || !message.trim()) return
+    setMessageBusy(true)
+    setError(null)
+    const { error } = await supabase.rpc('portal_send_message', {
+      p_email: customer.email,
+      p_portal_code: customer.portal_code,
+      p_body: message.trim(),
+    })
+    if (error) setError(error.message)
+    else {
+      setMessage('')
+      setMessageSent(true)
+    }
+    setMessageBusy(false)
   }
 
   if (!customer) return null
@@ -252,7 +292,7 @@ export default function PortalDashboard() {
                 ) : (
                   <div className="divide-y divide-line">
                     {latestQuotes.map((q) => (
-                      <div key={q.id} className="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <div key={q.id} className="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div>
                           <p className="font-medium text-ink capitalize">
                             {q.service_type.replace(/_/g, ' ')} · {q.frequency.replace('_', ' ')}
@@ -261,28 +301,69 @@ export default function PortalDashboard() {
                             {format(new Date(q.created_at), 'MMM d, yyyy')} · {q.status}
                           </p>
                         </div>
-                        <p className="font-mono-num font-semibold text-sage-deep">
-                          ${Number(q.total).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                        </p>
+                        <div className="flex flex-col items-end gap-2">
+                          <p className="font-mono-num font-semibold text-sage-deep">
+                            ${Number(q.total).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                          </p>
+                          {q.status === 'sent' && (
+                            <div className="flex gap-2">
+                              <Button
+                                type="button"
+                                disabled={quoteBusyId === q.id}
+                                onClick={() => updateQuoteStatus(q.id, 'accepted')}
+                              >
+                                Accept
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                disabled={quoteBusyId === q.id}
+                                onClick={() => updateQuoteStatus(q.id, 'declined')}
+                              >
+                                Decline
+                              </Button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
                 )}
               </div>
 
-              <div className="ticket-card p-5">
-                <h2 className="font-display font-semibold text-ink">Quick actions</h2>
-                <p className="text-sm text-slate mt-1">Take care of the next step in one tap.</p>
-                <div className="mt-4 grid gap-3">
+              <div className="ticket-card p-5 space-y-4">
+                <div>
+                  <h2 className="font-display font-semibold text-ink">Quick actions</h2>
+                  <p className="text-sm text-slate mt-1">Take care of the next step in one tap.</p>
+                </div>
+                <div className="grid gap-3">
                   {pendingPayments[0]?.access_token && (
                     <Link to={`/pay/${pendingPayments[0].access_token}`}>
                       <Button className="w-full justify-center">Pay your balance</Button>
                     </Link>
                   )}
                   <Link to="/review/new">
-                    <Button variant="secondary" className="w-full justify-center">Leave a review</Button>
+                    <Button variant="secondary" className="w-full justify-center">
+                      Leave a review
+                    </Button>
                   </Link>
                 </div>
+                <form onSubmit={sendMessage} className="border-t border-line pt-4 space-y-2">
+                  <p className="text-sm font-medium text-ink">Message your cleaner</p>
+                  <textarea
+                    className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm text-ink min-h-[72px]"
+                    placeholder="Ask a question or share access notes…"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    maxLength={2000}
+                  />
+                  {messageSent && (
+                    <p className="text-xs text-sage-deep">Message sent. The team will follow up by email or phone.</p>
+                  )}
+                  <Button type="submit" variant="secondary" disabled={messageBusy || !message.trim()}>
+                    {messageBusy ? 'Sending…' : 'Send message'}
+                  </Button>
+                </form>
               </div>
             </section>
 

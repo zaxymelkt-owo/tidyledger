@@ -24,7 +24,7 @@ export default function QuoteRequests() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<'all' | QuoteRequestStatus>('all')
-  const [selected, setSelected] = useState<QuoteRequest | null>(null)
+  const [selected, setSelected] = useState<QuoteRequestRow | null>(null)
   const [adminNotes, setAdminNotes] = useState('')
   const [saving, setSaving] = useState(false)
 

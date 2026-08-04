@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Topbar from '../components/layout/Topbar'
 import Button from '../components/ui/Button'
-import { Field, Input, Textarea } from '../components/ui/Field'
+import { Field, Input } from '../components/ui/Field'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import type { QuotePricingAddon } from '../types'

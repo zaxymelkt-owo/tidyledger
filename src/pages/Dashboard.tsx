@@ -21,6 +21,7 @@ import {
 import Topbar from '../components/layout/Topbar'
 import StatCard from '../components/ui/StatCard'
 import Button from '../components/ui/Button'
+import SetupChecklist from '../components/SetupChecklist'
 import { supabase } from '../lib/supabase'
 import type { JobWithCustomer, QuoteRequest, Payment } from '../types'
 
@@ -221,6 +222,12 @@ export default function Dashboard() {
         {error && (
           <div className="mb-6 rounded-lg border border-clay/30 bg-clay/5 px-4 py-3 text-sm text-clay">
             {error}
+          </div>
+        )}
+
+        {!loading && (
+          <div className="mb-6">
+            <SetupChecklist />
           </div>
         )}
 

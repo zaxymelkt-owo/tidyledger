@@ -16,7 +16,11 @@ Supabase (Postgres) for data. Built to run entirely on GitHub Pages with no serv
      [`database/003_new_modules.sql`](./database/003_new_modules.sql) instead.
    - If you'd already run an earlier version before the Jobs module existed, run
      [`database/002_jobs_add_fields.sql`](./database/002_jobs_add_fields.sql) first.
+   - Full ordered list (portal, Stripe, field ops, multitenant, payroll, quote pricing, etc.):
+     see [`database/README.md`](./database/README.md).
 3. Go to **Project Settings → API** and copy the **Project URL** and **anon public key**.
+   In **Authentication → URL configuration**, add redirect URLs for password recovery, e.g.
+   `https://tidyledger.github.io/tidyledger/login` and `http://localhost:5173/tidyledger/login`.
 4. Create your login: **Authentication → Users → Add user**, and set an email + password. There's no
    public sign-up screen in the app on purpose — this is an internal admin tool, so accounts are created
    by you, not self-served. Add one user per staff member who needs access.
@@ -221,3 +225,8 @@ values ('YOUR-AUTH-USER-UUID', 'you@tidyledger.com', 'Platform Owner');
 
 Business owners see **Accept commission terms** until accepted. Payroll lives under **Payroll** (owners/managers) and **My pay** (employees).
 # tidyledger
+
+
+## Security
+
+See [`docs/SECURITY.md`](./docs/SECURITY.md) for auth, platform admins, sensitive fields, and rate limits.

@@ -3,9 +3,15 @@ Allow: /
 Allow: /tidyledger/
 Allow: /tidyledger/request-quote
 Allow: /tidyledger/portal
+Allow: /tidyledger/terms
+Allow: /tidyledger/privacy
+Allow: /tidyledger/register
 Disallow: /tidyledger/dashboard
 Disallow: /tidyledger/customers
 Disallow: /tidyledger/jobs
 Disallow: /tidyledger/login
+Disallow: /tidyledger/quotes
+Disallow: /tidyledger/payments
+Disallow: /tidyledger/platform
 
-Sitemap: https://tidyledger.github.io/tidyledger/sitemap.xml
+Sitemap: https://zaxymelkt-owo.github.io/tidyledger/sitemap.xml

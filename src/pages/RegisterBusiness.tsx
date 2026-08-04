@@ -138,6 +138,17 @@ export default function RegisterBusiness() {
                 </form>
               )}
             </div>
+            <p className="text-xs text-slate text-center mt-4">
+              By creating a workspace you agree to our{' '}
+              <Link to="/terms" className="text-sage-deep font-medium hover:underline">
+                Terms
+              </Link>{' '}
+              and{' '}
+              <Link to="/privacy" className="text-sage-deep font-medium hover:underline">
+                Privacy Policy
+              </Link>
+              .
+            </p>
           </div>
         </main>
       </div>

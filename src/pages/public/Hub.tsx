@@ -189,6 +189,29 @@ export default function Hub() {
     </div>
   </div>
 </section>
+
+        <footer className="border-t border-line mt-auto">
+          <div className="max-w-5xl mx-auto px-5 py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate">
+            <span>© {new Date().getFullYear()} TidyLedger</span>
+            <div className="flex flex-wrap gap-4">
+              <Link to="/terms" className="hover:text-ink">
+                Terms
+              </Link>
+              <Link to="/privacy" className="hover:text-ink">
+                Privacy
+              </Link>
+              <Link to="/register" className="hover:text-ink">
+                Business register
+              </Link>
+              <Link to="/login" className="hover:text-ink">
+                Login
+              </Link>
+              <Link to="/portal" className="hover:text-ink">
+                Portal
+              </Link>
+            </div>
+          </div>
+        </footer>
       </div>
     </>
   )

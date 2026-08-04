@@ -35,6 +35,8 @@ import PlatformCommissions from './pages/platform/PlatformCommissions'
 import RequestQuote from './pages/public/RequestQuote'
 import PayOnline from './pages/public/PayOnline'
 import LeaveReview from './pages/public/LeaveReview'
+import TermsOfService from './pages/public/TermsOfService'
+import PrivacyPolicy from './pages/public/PrivacyPolicy'
 import PortalLogin from './pages/portal/PortalLogin'
 import PortalDashboard from './pages/portal/PortalDashboard'
 
@@ -63,6 +65,8 @@ export default function App() {
             <Route path="/request-quote" element={<RequestQuote />} />
             <Route path="/pay/:token" element={<PayOnline />} />
             <Route path="/review/:token" element={<LeaveReview />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/portal" element={<PortalLogin />} />
             <Route path="/portal/dashboard" element={<PortalDashboard />} />
             <Route path="/login" element={<Login />} />

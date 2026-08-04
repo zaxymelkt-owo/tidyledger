@@ -115,6 +115,15 @@ export default function Login() {
             </Link>
             . Employees use the invite link from their owner.
           </p>
+          <p className="text-xs text-slate text-center mt-3">
+            <Link to="/terms" className="hover:text-ink">
+              Terms
+            </Link>
+            <span className="mx-2 text-line">·</span>
+            <Link to="/privacy" className="hover:text-ink">
+              Privacy
+            </Link>
+          </p>
         </div>
       </div>
     </div>
